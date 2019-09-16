@@ -2,4 +2,6 @@
 
 const cli = require('./src/cli');
 
-cli();
+(async () => {
+  await cli();
+})();

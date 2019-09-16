@@ -1,12 +1,9 @@
 "use strict";
 
+var setupData = require('./setupData');
 var term = require('terminal-kit').terminal;
 
-
-
 module.exports = async () => {
-  let projectName = {};
-
   let steps = {
     getName() {
       term(`Project name: `);
@@ -16,7 +13,8 @@ module.exports = async () => {
         },
         (error, input) => {
 
-          projectName.project_name = input;
+          setupData.project_name = input;
+
           steps.createFolder();
         }
       );
@@ -29,18 +27,30 @@ module.exports = async () => {
       }, function(error, result) {
 
         if (result) {
-          projectName.create_project_folder = true;
+          setupData.create_project_folder = true;
           steps.setProjectFolder();
-
         } else {
-          return projectName;
+          setupData.create_project_folder = false;
+          console.log(setupData);
+          process.exit();
+          return true;
         }
       });
     },
     setProjectFolder() {
-      term(`\nFolder`);
+      term(`\nChoose folder name: `);
+      term.inputField({
+          autoCompleteMenu: false
+        },
+        (error, input) => {
+
+          setupData.project_folder_name = input;
+          console.log(setupData);
+          process.exit();
+        }
+      );
     }
   }
 
   steps.getName();
-}
+};
