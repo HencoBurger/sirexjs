@@ -1,10 +1,10 @@
+#! /usr/bin/env node
 "use strict";
 
 const term = require('terminal-kit').terminal;
-const intro = require('./intro');
-const projectName = require('./projectName');
+const initProject = require('./initProject');
 
-module.exports = async () => {
+module.exports = (() => {
   let setupOptions = {};
 
   term(`
@@ -17,47 +17,32 @@ module.exports = async () => {
 ##    ##  ##  ##    ##  ##        ##   ##  ##    ## ##    ##
  ######  #### ##     ## ######## ##     ##  ######   ######
 `) ;
-term(`
-  \n\n
-  Service layer architecture for Express.js
-  Follow the prompts to setup your new project.
-  \n\n
-`);
 
-term.cyan(`
-  \n\n
+term.cyan(`\n
   Service layer architecture for Express.js
   Follow the prompts to setup your new project.
-  \n\n
+  \n
 `) ;
 
 var items = [
-  'Initiate new project.',
-  'Create service.'
+  `init     Create new project.`,
+  `service  Create new service.`
 ];
 
-term.singleColumnMenu( items , function( error , response ) {
-  term( '\n' ).eraseLineAfter.green(
-    "#%s selected: %s (%s,%s)\n" ,
-    response.selectedIndex ,
-    response.selectedText ,
-    response.x ,
-    response.y
-  ) ;
-
+term.singleColumnMenu( items , async function( error , response ) {
   switch(response.selectedIndex) {
     case 0:
-      (async () => { await projectName(); })()
+      await initProject();
       break;
     case 1:
       // code block
       break;
   }
-  process.exit() ;
+  // process.exit() ;
 } );
 
   // process.exit();
-  // let  project = await projectName();
+  // let  project = await initProject();
   // setupOptions = Object.assign(setupOptions, project);
   // term.inputField(
   // 	{autoCompleteMenu: false } ,
@@ -68,4 +53,4 @@ term.singleColumnMenu( items , function( error , response ) {
   		// process.exit();
   // 	}
   // );
-}
+})();
