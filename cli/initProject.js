@@ -36,50 +36,55 @@ module.exports = async () => {
         }
       });
     },
-    async setProjectFolder() {
+    setProjectFolder() {
       term(`\nChoose folder name: `);
+      term.inputField({
+          autoCompleteMenu: false
+        },
+        (error, input) => {
+          setupData.project_folder_name = input;
+          steps.version();
+        }
+      );
+    },
+    version() {
+      term(`\nVersion(0.1.0): `);
       term.inputField({
           autoCompleteMenu: false
         },
         async (error, input) => {
 
-          setupData.project_folder_name = input;
-          await steps.packageOptions();
+          setupData.version = input;
+          steps.description();
         }
       );
     },
-    async packageOptions() {
-      term(`\nVersion: (0.1.0)`);
-      term.inputField({
-          autoCompleteMenu: false
-        },
-        (error, input) => {
-
-          setupData.version = input;
-        }
-      );
-
+    description() {
       term(`\nDescription: `);
       term.inputField({
           autoCompleteMenu: false
         },
-        (error, input) => {
+        async (error, input) => {
 
           setupData.description = input;
+          steps.author();
         }
       );
-
+    },
+    author() {
       term(`\nAuthor: `);
       term.inputField({
           autoCompleteMenu: false
         },
-        (error, input) => {
+        async (error, input) => {
 
           setupData.author = input;
+
+          console.log(setupData);
+          await steps.saveNpmPackageFile();
         }
       );
 
-      await steps.saveNpmPackageFile();
     },
     async saveNpmPackageFile() {
       await build();

@@ -32,7 +32,7 @@ var items = [
 term.singleColumnMenu( items , async function( error , response ) {
   switch(response.selectedIndex) {
     case 0:
-      await initProject();
+      initProject();
       break;
     case 1:
       // code block
