@@ -32,7 +32,7 @@ module.exports = async () => {
           await steps.setProjectFolder();
         } else {
           setupData.create_project_folder = false;
-          await steps.packageOptions();
+          await steps.version();
         }
       });
     },
@@ -88,6 +88,8 @@ module.exports = async () => {
     },
     async saveNpmPackageFile() {
       await build();
+
+      return true;
     }
   }
 
