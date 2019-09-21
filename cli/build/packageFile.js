@@ -34,12 +34,21 @@ module.exports = async (options) => {
   }
 }`;
 
-  fs.writeFileSync(`${process.cwd()}/package.json`, defaultInitFile, function(err) {
-    if(err) {
-        return false;
-    }
-
-  });
+  fs.writeFileSync(`${process.cwd()}/package.json`, defaultInitFile);
+  fs.mkdirSync(`${process.cwd()}/src`);
+  fs.writeFileSync(`${process.cwd()}/src/README.md`, '');
+  fs.mkdirSync(`${process.cwd()}/src/middleware`);
+  fs.writeFileSync(`${process.cwd()}/src/middleware/README.md`, '');
+  fs.mkdirSync(`${process.cwd()}/src/router`);
+  fs.writeFileSync(`${process.cwd()}/src/router/README.md`, '');
+  fs.mkdirSync(`${process.cwd()}/src/services`);
+  fs.writeFileSync(`${process.cwd()}/src/services/README.md`, '');
+  fs.mkdirSync(`${process.cwd()}/src/extensions`);
+  fs.writeFileSync(`${process.cwd()}/src/extensions/README.md`, '');
+  fs.mkdirSync(`${process.cwd()}/src/utilities`);
+  fs.writeFileSync(`${process.cwd()}/src/utilities/README.md`, '');
+  fs.mkdirSync(`${process.cwd()}/test`);
+  fs.writeFileSync(`${process.cwd()}/test/README.md`, '');
   shell.exec('npm i').code;
 
   return true;
