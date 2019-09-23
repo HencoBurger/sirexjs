@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const shell = require('shelljs');
+const term = require('terminal-kit').terminal;
 
 module.exports = async (options) => {
   let defaultInitFile =
@@ -34,22 +35,48 @@ module.exports = async (options) => {
   }
 }`;
 
-  fs.writeFileSync(`${process.cwd()}/package.json`, defaultInitFile);
-  fs.mkdirSync(`${process.cwd()}/src`);
-  fs.writeFileSync(`${process.cwd()}/src/README.md`, '');
-  fs.mkdirSync(`${process.cwd()}/src/middleware`);
-  fs.writeFileSync(`${process.cwd()}/src/middleware/README.md`, '');
-  fs.mkdirSync(`${process.cwd()}/src/router`);
-  fs.writeFileSync(`${process.cwd()}/src/router/README.md`, '');
-  fs.mkdirSync(`${process.cwd()}/src/services`);
-  fs.writeFileSync(`${process.cwd()}/src/services/README.md`, '');
-  fs.mkdirSync(`${process.cwd()}/src/extensions`);
-  fs.writeFileSync(`${process.cwd()}/src/extensions/README.md`, '');
-  fs.mkdirSync(`${process.cwd()}/src/utilities`);
-  fs.writeFileSync(`${process.cwd()}/src/utilities/README.md`, '');
-  fs.mkdirSync(`${process.cwd()}/test`);
-  fs.writeFileSync(`${process.cwd()}/test/README.md`, '');
-  shell.exec('npm i').code;
+  let projectFolder = process.cwd();
 
-  return true;
+  if(options.create_project_folder) {
+    projectFolder = options.project_folder_name;
+    if(!fs.existsSync(projectFolder)) {
+      fs.mkdirSync(`${projectFolder}`);
+    } else {
+      term.red(`\n\n"${projectFolder}" Folder already exists!\n\n`);
+      process.exit();
+      return false;
+    }
+  }
+
+fs.writeFileSync(`${projectFolder}/README.md`, `# ${options.project_name}
+${options.description}
+`);
+
+  fs.writeFileSync(`${projectFolder}/package.json`, defaultInitFile);
+  fs.mkdirSync(`${projectFolder}/src`);
+  fs.writeFileSync(`${projectFolder}/src/README.md`, '');
+  fs.mkdirSync(`${projectFolder}/src/middleware`);
+  fs.writeFileSync(`${projectFolder}/src/middleware/README.md`, '');
+  fs.mkdirSync(`${projectFolder}/src/router`);
+  fs.writeFileSync(`${projectFolder}/src/router/README.md`, '');
+  fs.mkdirSync(`${projectFolder}/src/services`);
+  fs.writeFileSync(`${projectFolder}/src/services/README.md`, '');
+  fs.mkdirSync(`${projectFolder}/src/extensions`);
+  fs.writeFileSync(`${projectFolder}/src/extensions/README.md`, '');
+  fs.mkdirSync(`${projectFolder}/src/utilities`);
+  fs.writeFileSync(`${projectFolder}/src/utilities/README.md`, '');
+  fs.mkdirSync(`${projectFolder}/test`);
+  fs.writeFileSync(`${projectFolder}/test/README.md`, '');
+
+  // var child = shell.exec('npm i', {async:true});
+  // child.stdout.on('data', function(data) {
+  //   console.log(data);
+  // });
+  //
+  // child.stdout.on('close', (code) => {
+  //   return true;
+  // });
+  shell.cd(projectFolder);
+  shell.exec('npm i');
+
 }

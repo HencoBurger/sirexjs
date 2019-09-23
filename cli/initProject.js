@@ -53,8 +53,9 @@ module.exports = async () => {
           autoCompleteMenu: false
         },
         async (error, input) => {
-
-          setupData.version = input;
+          if(input != '') {
+            setupData.version = input;
+          }
           steps.description();
         }
       );
