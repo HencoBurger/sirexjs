@@ -68,15 +68,10 @@ ${options.description}
   fs.mkdirSync(`${projectFolder}/test`);
   fs.writeFileSync(`${projectFolder}/test/README.md`, '');
 
-  // var child = shell.exec('npm i', {async:true});
-  // child.stdout.on('data', function(data) {
-  //   console.log(data);
-  // });
-  //
-  // child.stdout.on('close', (code) => {
-  //   return true;
-  // });
-  shell.cd(projectFolder);
-  shell.exec('npm i');
+  if(process.cwd() !== projectFolder) {
+    shell.cd(projectFolder);
+  }
 
+  shell.exec('npm i');
+  term.green(`\n\nSetup and ready to go...`);
 }

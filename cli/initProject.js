@@ -23,7 +23,10 @@ module.exports = async () => {
     createFolder() {
       term(`\nDo you want to create a project folder? [y|n]`);
       term.yesOrNo({
-        yes: ['y', 'ENTER'],
+        yes: [
+          'y',
+          // 'ENTER'
+        ],
         no: ['n']
       }, async function(error, result) {
 
@@ -81,15 +84,14 @@ module.exports = async () => {
 
           setupData.author = input;
 
-          console.log(setupData);
           await steps.saveNpmPackageFile();
         }
       );
 
     },
     async saveNpmPackageFile() {
+      term.yellow(`\n\nSetting up Sirexjs and Node...`);
       await build();
-
       return true;
     }
   }
