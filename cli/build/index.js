@@ -5,6 +5,6 @@ const packageFile = require('./packageFile.js');
 const setupData = require('../setupData');
 
 module.exports = () => {
-  console.log(packageFile(setupData));
+  packageFile(setupData);
   process.exit();
 }
