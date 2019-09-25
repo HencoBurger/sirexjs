@@ -61,6 +61,9 @@ ${options.description}
   fs.writeFileSync(`${projectFolder}/src/router/README.md`, '');
   fs.mkdirSync(`${projectFolder}/src/services`);
   fs.writeFileSync(`${projectFolder}/src/services/README.md`, '');
+  let serviceIndex = fs.readFileSync(`../service/temp/serviceIndex.js`);
+  console.log(serviceIndex);
+  fs.writeFileSync(`${projectFolder}/src/services/index.js`, serviceIndex);
   fs.mkdirSync(`${projectFolder}/src/extensions`);
   fs.writeFileSync(`${projectFolder}/src/extensions/README.md`, '');
   fs.mkdirSync(`${projectFolder}/src/utilities`);

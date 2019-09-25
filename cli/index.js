@@ -4,6 +4,7 @@
 
 const term = require('terminal-kit').terminal;
 const initProject = require('./initProject');
+const createService = require('./createService');
 
 module.exports = (() => {
   let setupOptions = {};
@@ -36,7 +37,7 @@ module.exports = (() => {
         initProject();
         break;
       case 1:
-        // code block
+        createService();
         break;
     }
     // process.exit() ;
