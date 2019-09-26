@@ -16,11 +16,11 @@
 const services = (() => { const fs = require('fs');
   const folderPath = process.cwd();
 
-  let folders = fs.readdirSync(`${folderPath}/app/services`);
+  let folders = fs.readdirSync(`${folderPath}/src/services`);
   let foundServices = [];
 
   for(let folder of folders) {
-    if(fs.lstatSync(`${folderPath}/app/services/${folder}`).isDirectory()) {
+    if(fs.lstatSync(`${folderPath}/src/services/${folder}`).isDirectory()) {
       foundServices.push(folder);
     }
   }

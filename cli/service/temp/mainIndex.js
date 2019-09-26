@@ -2,27 +2,30 @@
 
 const packageJson = require('./package.json');
 process.env.APP_VERSION = packageJson.version;
+process.env.APP_PORT = (typeof process.env.APP_PORT === 'undefined') ? 3000 : process.env.APP_PORT;
+process.env.NODE_ENV = (typeof process.env.NODE_ENV === 'undefined') ? 'dev' : process.env.NODE_ENV;
 
 require('dotenv').config();
-require('app-module-path').addPath(__dirname + '/app');
+require('app-module-path').addPath(__dirname + '/src');
 
 const sirexjs = require('sirexjs');
 // const router = require('core/router');
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
-const routes = require('routes/index');
+const routes = require('router/index');
 const cors = require('cors');
 
 // TODO Refactor mongoDB connection
 // const mongodb = require('core/databases/mongodb');
 
 const app = express();
-// router.setRouter(express.Router());
-sirexjs.databas.mongodb.connect();
 
 // Inject extentions
 Object.assign(app, sirexjs.extensions());
+
+// router.setRouter(express.Router());
+sirexjs.database.mongodb.connect();
 
 // Setup app to use CORS
 app.use(cors());

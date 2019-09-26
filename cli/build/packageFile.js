@@ -28,7 +28,8 @@ module.exports = async (options) => {
     "express-fileupload": "1.1.5",
     "moment": "2.24.0",
     "mongoose": "5.6.12",
-    "winston": "3.2.1"
+    "winston": "3.2.1",
+    "sirexjs": "C:/\Users/\Henco/\Code/\sirexjs"
   },
   "devDependencies": {
     "chai": "4.2.0",
@@ -54,6 +55,10 @@ fs.writeFileSync(`${projectFolder}/README.md`, `# ${options.project_name}
 ${options.description}
 `);
 
+  fs.writeFileSync(`${projectFolder}/.env`,
+`# Environment variables go here.
+`);
+
   let mainIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/mainIndex.js"));
   fs.writeFileSync(`${projectFolder}/index.js`, mainIndex);
 
@@ -63,9 +68,22 @@ ${options.description}
   fs.writeFileSync(`${projectFolder}/src/README.md`, '');
 
   fs.mkdirSync(`${projectFolder}/src/middleware`);
+  fs.writeFileSync(`${projectFolder}/src/middleware/index.js`,
+` 'use strict';
+
+/**
+ * Any middleware goes here. Refer to Express.js.
+ * @type {Object}
+ */
+
+module.exports = {};
+
+`);
   fs.writeFileSync(`${projectFolder}/src/middleware/README.md`, '');
 
   fs.mkdirSync(`${projectFolder}/src/router`);
+  let routeIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/routeIndex.js"));
+  fs.writeFileSync(`${projectFolder}/src/router/index.js`, routeIndex);
   fs.writeFileSync(`${projectFolder}/src/router/README.md`, '');
 
   fs.mkdirSync(`${projectFolder}/src/services`);
