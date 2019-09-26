@@ -1,10 +1,12 @@
 "use strict";
 
 const fs = require('fs');
+const path = require("path");
 const shell = require('shelljs');
 const term = require('terminal-kit').terminal;
 
 module.exports = async (options) => {
+  try {
   let defaultInitFile =
 `{
   "name": "${options.project_name}",
@@ -52,22 +54,28 @@ fs.writeFileSync(`${projectFolder}/README.md`, `# ${options.project_name}
 ${options.description}
 `);
 
+  let mainIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/mainIndex.js"));
+  fs.writeFileSync(`${projectFolder}/index.js`, mainIndex);
+
   fs.writeFileSync(`${projectFolder}/package.json`, defaultInitFile);
+
   fs.mkdirSync(`${projectFolder}/src`);
   fs.writeFileSync(`${projectFolder}/src/README.md`, '');
+
   fs.mkdirSync(`${projectFolder}/src/middleware`);
   fs.writeFileSync(`${projectFolder}/src/middleware/README.md`, '');
+
   fs.mkdirSync(`${projectFolder}/src/router`);
   fs.writeFileSync(`${projectFolder}/src/router/README.md`, '');
+
   fs.mkdirSync(`${projectFolder}/src/services`);
   fs.writeFileSync(`${projectFolder}/src/services/README.md`, '');
-  let serviceIndex = fs.readFileSync(`../service/temp/serviceIndex.js`);
-  console.log(serviceIndex);
+  let serviceIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/serviceIndex.js"));
   fs.writeFileSync(`${projectFolder}/src/services/index.js`, serviceIndex);
-  fs.mkdirSync(`${projectFolder}/src/extensions`);
-  fs.writeFileSync(`${projectFolder}/src/extensions/README.md`, '');
+
   fs.mkdirSync(`${projectFolder}/src/utilities`);
   fs.writeFileSync(`${projectFolder}/src/utilities/README.md`, '');
+
   fs.mkdirSync(`${projectFolder}/test`);
   fs.writeFileSync(`${projectFolder}/test/README.md`, '');
 
@@ -77,4 +85,7 @@ ${options.description}
 
   shell.exec('npm i');
   term.green(`\n\nSetup and ready to go...`);
+} catch(e) {
+  console.error(e);
+}
 }
