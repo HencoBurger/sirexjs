@@ -12,18 +12,13 @@ module.exports = async () => {
       term.inputField({
           autoCompleteMenu: false
         },
-        (error, input) => {
+        async (error, input) => {
 
           serviceData.service_name = input;
 
-          steps.createFolder();
+          await service();
         }
       );
-    },
-    async saveNpmPackageFile() {
-      term.yellow(`\n\nSetting up Sirexjs and Node...`);
-      await service();
-      return true;
     }
   }
 
