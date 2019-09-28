@@ -56,7 +56,7 @@ module.exports = class Databases {
 
     mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
     mongoose.connection.once('open', function() {
-      logger.info('MongoDB connec');
+      logger.info('MongoDB connected');
     });
   }
 

@@ -53,7 +53,7 @@ fs.writeFileSync(`${serviceFolder}/model/index.js`,
 const sirexjs = require('sirexjs');
 const schema = require('./schema');
 
-module.exports = class ${helpers.capitalized(serviceData.service_name)}Model extends sirexjs.database.mongodb {
+module.exports = class ${helpers.capitalized(serviceData.service_name)}Model extends sirexjs.Database.mongodb {
 
   get collectionName() {
     return '${serviceData.service_name}';
