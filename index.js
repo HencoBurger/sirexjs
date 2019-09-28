@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = {
-  database: require('./src/databases'),
-  extensions: require('./src/extensions'),
-  services: require('./src/services')
+  Database: require('./src/databases'),
+  Extensions: require('./src/extensions'),
+  Services: require('./src/services')
 }

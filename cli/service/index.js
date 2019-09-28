@@ -42,12 +42,12 @@ module.exports = (() => { return new ${helpers.capitalized(serviceData.service_n
   fs.writeFileSync(`${serviceFolder}/routes/index.js`, routeIndex);
 
   fs.mkdirSync(`${serviceFolder}/model`);
-  fs.writeFileSync(`${serviceFolder}/schema.js`,
+  fs.writeFileSync(`${serviceFolder}/model/schema.js`,
 `'use strict';
 
 module.exports = {};
 `);
-fs.writeFileSync(`${serviceFolder}/index.js`,
+fs.writeFileSync(`${serviceFolder}/model/index.js`,
 `'use strict';
 
 const sirexjs = require('sirexjs');

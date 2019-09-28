@@ -11,21 +11,16 @@ require('app-module-path').addPath(__dirname + '/src');
 const sirexjs = require('sirexjs');
 // const router = require('core/router');
 const express = require('express');
+const app = express();
+Object.assign(app, sirexjs.Extensions());
+
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const routes = require('router/index');
 const cors = require('cors');
 
-// TODO Refactor mongoDB connection
-// const mongodb = require('core/databases/mongodb');
-
-const app = express();
-
-// Inject extentions
-Object.assign(app, sirexjs.extensions());
-
-// router.setRouter(express.Router());
-sirexjs.database.mongodb.connect();
+// TODO check between mongodb and mysql
+sirexjs.Database.mongodb.connect();
 
 // Setup app to use CORS
 app.use(cors());
@@ -38,8 +33,12 @@ app.use(fileUpload()); // Upload files
 // Custom response for all reoutes
 app.use(restResponse.setResponse);
 
+// View requests
+app.use(routeRequest);
+
+let apiVersion = (typeof process.env.API_VERSION !== 'undefined') ? process.env.API_VERSION : '';
 // Load routing
-app.use('/', routes);
+app.use(`/${apiVersion}`, routes);
 
 app.listen(process.env.APP_PORT, function() {
   logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);

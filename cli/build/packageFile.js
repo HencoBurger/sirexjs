@@ -57,6 +57,7 @@ ${options.description}
 
   fs.writeFileSync(`${projectFolder}/.env`,
 `# Environment variables go here.
+APP_NAME=${options.project_name}
 `);
 
   let mainIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/mainIndex.js"));
