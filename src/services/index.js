@@ -6,14 +6,14 @@ const path = require('path');
 module.exports = class Services {
 
   get model() {
-    const model = require(`services/${this.serviceName}/model`);
+    const model = require(`${process.cwd()}/src/services/${this.serviceName}/model`);
 
     return new model();
   }
 
   manager(managerName, method, properties = {}) {
     try {
-      const managerInstance = require(`services/${this.serviceName}/managers/${managerName}`);
+      const managerInstance = require(`${process.cwd()}/src/services/${this.serviceName}/managers/${managerName}`);
       if(typeof method !== 'undefined') {
         return managerInstance[method](properties);
       } else {
@@ -27,7 +27,7 @@ module.exports = class Services {
 
   get routes() {
     try {
-      const routes = require(`services/${this.serviceName}/routes`);
+      const routes = require(`${process.cwd()}/src/services/${this.serviceName}/routes`);
 
       return routes;
     } catch(e) {
@@ -54,7 +54,7 @@ module.exports = class Services {
       let servicesFolders = {};
       for(let key in foundServices) {
         let value = foundServices[key];
-        servicesFolders[value] = require(`services/${value}`);
+        servicesFolders[value] = require(`${folderPath}/src/services/${value}`);
       }
 
       return servicesFolders;
