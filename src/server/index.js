@@ -37,7 +37,7 @@ module.exports.load = (hooks = {}) => {
   app.use(fileUpload()); // Upload files
 
   // Custom response for all reoutes
-  app.use(restResponse.setResponse);
+  app.use(restResponse);
 
   // View requests
   app.use(routeRequest);

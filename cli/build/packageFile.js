@@ -15,7 +15,7 @@ module.exports = async (options) => {
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "dev": "nodemon index.js --watch app/ --ignore node_modules/"
+    "dev": "nodemon index.js --watch src/ --ignore node_modules/"
   },
   "author": "${options.author}",
   "license": "ISC",
@@ -70,15 +70,21 @@ APP_NAME=${options.project_name}
 
   fs.mkdirSync(`${projectFolder}/src/middleware`);
   fs.writeFileSync(`${projectFolder}/src/middleware/index.js`,
-` 'use strict';
+`/*
 
-/**
- * Any middleware goes here. Refer to Express.js.
- * @type {Object}
- */
+  DO NOT DELETE OR MODIFY THIS FILE
 
-module.exports = {};
+  This file loads up saved middleware.
 
+*/
+
+'use strict';
+
+const sirexjs = require('sirexjs');
+
+module.exports = (() => {
+ return sirexjs.Middleware.load();
+})();
 `);
   fs.writeFileSync(`${projectFolder}/src/middleware/README.md`, '');
 

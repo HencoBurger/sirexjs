@@ -36,7 +36,7 @@ module.exports = class Services {
     }
   }
 
-  static loadServices() {
+  static load() {
     try {
       // Get all services
       const folderPath = process.cwd();

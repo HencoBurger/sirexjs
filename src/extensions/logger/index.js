@@ -2,7 +2,7 @@
 
 const winston = require('winston')
 
-module.exports = class Logging {
+class Logging {
 
   constructor() {
     return winston.createLogger({
@@ -15,4 +15,10 @@ module.exports = class Logging {
     });
   }
 
+  static get run() {
+    return new Logging();
+  }
+
 }
+
+module.exports = Logging.run;

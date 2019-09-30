@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = class RestResponse {
+class RestResponse {
 
   static response(payload, customStatus) {
       // Default satus
@@ -29,8 +29,10 @@ module.exports = class RestResponse {
       this.status(status).json(response);
   }
 
-  setResponse(req, res, next) {
+  static setResponse(req, res, next) {
     res.restResponse = RestResponse.response;
     next();
   }
 }
+
+module.exports = RestResponse.setResponse;

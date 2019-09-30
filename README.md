@@ -12,11 +12,14 @@ Sirex is my opinion on how to use Express.
 npm i -g sirexjs
 </code>
 
-### Create App
-In your project folder or any folder you saved your code. </br>
 ##### RUN </br>
 <code>
 sirexjs
 </code>
 
-Choose create "Init" option.
+Choose from the following options.
+
+- **init - Create new project.<br/>**
+  Navigate to your project folder or ask Sirex to create a new project folder for you.
+- **service - Create new service.<br/>**
+  Using this command helps you to create the folder structure and initial code to help you to develop your new service.
