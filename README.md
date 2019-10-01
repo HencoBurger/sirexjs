@@ -22,4 +22,6 @@ Choose from the following options.
 - **init - Create new project.<br/>**
   Navigate to your project folder or ask Sirex to create a new project folder for you.
 - **service - Create new service.<br/>**
-  Using this command helps you to create the folder structure and initial code to help you to develop your new service.
+  Use this option to create the folder structure and initial code to develop your new service.
+- **middleware - Create new middleware.<br/>**
+  Creates a middleware template function in "src/middleware".
