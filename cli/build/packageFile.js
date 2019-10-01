@@ -1,10 +1,12 @@
 "use strict";
 
 const fs = require('fs');
+const path = require("path");
 const shell = require('shelljs');
 const term = require('terminal-kit').terminal;
 
 module.exports = async (options) => {
+  try {
   let defaultInitFile =
 `{
   "name": "${options.project_name}",
@@ -13,7 +15,7 @@ module.exports = async (options) => {
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "dev": "nodemon index.js --watch app/ --ignore node_modules/"
+    "dev": "nodemon index.js --watch src/ --ignore node_modules/"
   },
   "author": "${options.author}",
   "license": "ISC",
@@ -26,7 +28,8 @@ module.exports = async (options) => {
     "express-fileupload": "1.1.5",
     "moment": "2.24.0",
     "mongoose": "5.6.12",
-    "winston": "3.2.1"
+    "winston": "3.2.1",
+    "sirexjs": "C:/\Users/\Henco/\Code/\sirexjs"
   },
   "devDependencies": {
     "chai": "4.2.0",
@@ -52,19 +55,52 @@ fs.writeFileSync(`${projectFolder}/README.md`, `# ${options.project_name}
 ${options.description}
 `);
 
+  fs.writeFileSync(`${projectFolder}/.env`,
+`# Environment variables go here.
+APP_NAME=${options.project_name}
+`);
+
+  let mainIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/mainIndex.js"));
+  fs.writeFileSync(`${projectFolder}/index.js`, mainIndex);
+
   fs.writeFileSync(`${projectFolder}/package.json`, defaultInitFile);
+
   fs.mkdirSync(`${projectFolder}/src`);
   fs.writeFileSync(`${projectFolder}/src/README.md`, '');
+
   fs.mkdirSync(`${projectFolder}/src/middleware`);
+  fs.writeFileSync(`${projectFolder}/src/middleware/index.js`,
+`/*
+
+  DO NOT DELETE OR MODIFY THIS FILE
+
+  This file loads up saved middleware.
+
+*/
+
+'use strict';
+
+const sirexjs = require('sirexjs');
+
+module.exports = (() => {
+ return sirexjs.Middleware.load();
+})();
+`);
   fs.writeFileSync(`${projectFolder}/src/middleware/README.md`, '');
+
   fs.mkdirSync(`${projectFolder}/src/router`);
+  let routeIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/routeIndex.js"));
+  fs.writeFileSync(`${projectFolder}/src/router/index.js`, routeIndex);
   fs.writeFileSync(`${projectFolder}/src/router/README.md`, '');
+
   fs.mkdirSync(`${projectFolder}/src/services`);
   fs.writeFileSync(`${projectFolder}/src/services/README.md`, '');
-  fs.mkdirSync(`${projectFolder}/src/extensions`);
-  fs.writeFileSync(`${projectFolder}/src/extensions/README.md`, '');
+  let serviceIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/serviceIndex.js"));
+  fs.writeFileSync(`${projectFolder}/src/services/index.js`, serviceIndex);
+
   fs.mkdirSync(`${projectFolder}/src/utilities`);
   fs.writeFileSync(`${projectFolder}/src/utilities/README.md`, '');
+
   fs.mkdirSync(`${projectFolder}/test`);
   fs.writeFileSync(`${projectFolder}/test/README.md`, '');
 
@@ -74,4 +110,7 @@ ${options.description}
 
   shell.exec('npm i');
   term.green(`\n\nSetup and ready to go...`);
+} catch(e) {
+  console.error(e);
+}
 }

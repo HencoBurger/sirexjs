@@ -4,6 +4,8 @@
 
 const term = require('terminal-kit').terminal;
 const initProject = require('./initProject');
+const createService = require('./createService');
+const createMiddleware = require('./createMiddleware');
 
 module.exports = (() => {
   let setupOptions = {};
@@ -27,7 +29,8 @@ module.exports = (() => {
 
   var items = [
     `init     Create new project.`,
-    `service  Create new service.`
+    `service  Create new service.`,
+    `middleware  Create new middleware.`
   ];
 
   term.singleColumnMenu(items, async function(error, response) {
@@ -36,7 +39,10 @@ module.exports = (() => {
         initProject();
         break;
       case 1:
-        // code block
+        createService();
+        break;
+      case 2:
+        createMiddleware();
         break;
     }
     // process.exit() ;

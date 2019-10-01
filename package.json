@@ -26,7 +26,11 @@
   },
   "homepage": "https://github.com/HencoBurger/sirexjs#readme",
   "dependencies": {
-    "shelljs": "^0.8.3",
-    "terminal-kit": "^1.31.3"
+    "moment": "2.24.0",
+    "mongoose": "5.6.12",
+    "shelljs": "0.8.3",
+    "terminal-kit": "1.31.3",
+    "validator": "11.1.0",
+    "winston": "3.2.1"
   }
 }
