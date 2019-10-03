@@ -15,7 +15,7 @@ with its own routing table
 that connects to one database model.
 
 ## CLI
-### Install globally
+### Install
 Install Sirexjs globally.
 
 <code>
@@ -40,28 +40,40 @@ Choose from the following options.
 This option creates and new express application with predefined folder structure.  The creation process also pre-installs all the packages you would need to get an API up and running.
 
 ### Services
-Creating a new feature is sometimes a tedious process, using the CLI “service” options creates a new service in the main services folder with a predefined folder structure.
+Creating a new feature is sometimes a tedious process, using the CLI “service” options creates a new service in the main services folder also with a predefined folder structure.
 
 ### Getting started
-Create a new service called “user” with an attached API end-point.
+Create a new service called “user” with an attached API end-point and save data to MongoDB.
+
+- [Create Service](#create-service)
+- [Service Route](#service-route)
+- [Sub Routes](#service-sub-routes)
+- [Managers](#managers)
+- [Models](#models)
+- [Access Mongoose Types](#access-mongoose-types)
 
 Inside the project folder run:
+
+#### Create Service
 
 <code>
 sirexjs
 </code>
 
-Choose the options “service - Create new service” follow prompts and create user service.
+Choose the options “service - Create new service” follow prompts and create user service.<br/>
+After the service is completed you can pretty much use ther service for what ever you want.<br/>
+It can be used as a service that is attached to a API end-point or you can use for a stand-alone collection of code that can be used in you API application.
 
-#### service route
+Follow the next steps to attach the service to a API end-point and save data to MongoDB.
+
+#### Service Route
 Add the following router to a service.
 
 <code>router.use('/user', serviceGateway.user.routes);</code>
 
-Example:
+Example:<br/>
+project/src/router/index.js
 ```
-# project/src/router/index.js
-
 'use strict';
 
 const express = require('express');
@@ -81,13 +93,13 @@ module.exports = (function () {
   return router;
 })();
 ```
-
+#### service sub routes
 Add sub-routes to a service
 
 ```
 router.post('/sign-up', async (req, res) => {
     try {
-      const signUp = serviceGateway.user.manager('SignUp', 'init');
+      const signUp = serviceGateway.user.manager('SignUp');
       const user = await signUp.create(req.body);
       res.restResponse(user);
     } catch(e) {
@@ -97,7 +109,7 @@ router.post('/sign-up', async (req, res) => {
     }
   })
 ```
-
+Example:<br/>
 /project/src/services/user/routes
 
 ```
@@ -114,7 +126,7 @@ module.exports = (function () {
 
   router.post('/sign-up', async (req, res) => {
     try {
-      const signUp = serviceGateway.user.manager('SignUp', 'init');
+      const signUp = serviceGateway.user.manager('SignUp');
       const user = await signUp.create(req.body);
       res.restResponse(user);
     } catch(e) {
@@ -130,4 +142,129 @@ module.exports = (function () {
 
   return router;
 })();
+```
+
+#### Managers
+
+Service manager contains logic to manipulate data before you save it to a database or use the manipulated data in other parts of your application.
+
+You can access to the manager through the "serviceGateway".<br/>
+<code>serviceGateway.serviceName.manager('managerName');</code>
+
+Example:
+```
+const serviceGateway = require('services');
+
+module.exports = (data) => {
+  const signUp = serviceGateway.user.manager('SignUp');
+  const user = await signUp.create(data);
+};
+```
+
+Example - User Manager
+
+```
+'user strict';
+
+const serviceGateway = require('services');
+
+module.exports = class SignUp {
+  static async create(body) {
+    try {
+
+      const validate = validation();
+      validate.setValidFields({
+        'callsign': {
+          'rules': 'required'
+        },
+        'email': {
+          'rules': 'required|email'
+        }
+      });
+
+      if (validate.isValid(body)) {
+        console.log(validate.fields);
+        return await serviceGateway.user.model.createUser(validate.fields);
+      } else {
+        throw exceptions(404, 'Could not create new user', validate.errors);
+      }
+    } catch (e) {
+      logger.error("[managers][SignUp]", e);
+      throw e;
+    }
+  }
+}
+```
+
+#### Models
+At the moment MongoDB is the default database for SirexJs.<br/>
+When you create a service a model folder structure is created by default.
+
+Access model collection:<br/>
+<code> let user = await serviceGateway.user.model.collection.find({}); </code>
+
+Or extend the model with your own methods:<br/>
+<code> let user = await serviceGateway.user.model.createUser(saveData); </code>
+
+Example - extend models
+
+```
+'use strict';
+
+const sirexjs = require('sirexjs');
+const schema = require('./schema');
+
+module.exports = class UserModel extends sirexjs.Database.mongodb {
+
+  get collectionName() {
+    return 'user';
+  }
+
+  get collectionSchema() {
+    return schema;
+  }
+
+  /**
+   * Create new user
+   * @param  {Object}  userData User data
+   * @return {Promise}          Response
+   */
+  async createUser(userData) {
+    try {
+      let user = await this.collection.create(userData);
+      user = await this.collection.find({ _id: this.types.ObjectId(user._id) });
+      console.log(user);
+      return user;
+    } catch (e) {
+      logger.error("[UserModel][createUser]", e);
+      throw e;
+    }
+  }
+}
+```
+
+#### Access Mongoose Types
+Example - inside models
+
+```
+  async updateUser(id, userData) {
+    try {
+      return await this.collection.updateOne({ _id: this.types.ObjectId(id) }, userData);
+    } catch (e) {
+      logger.error("[UserModel][updateUser]", e);
+      throw e;
+    }
+  }
+```
+
+Example - Outside model
+
+```
+const serviceGateway = require('services');
+const sirexjs = require('sirexjs');
+
+module.exports = (id) => {
+  let types = sirexjs.Database.mongodb.types;
+  await serviceGateway.user.model.collection.updateOne({ _id: types.ObjectId(id) }, { callsign: 'Boo' });
+}
 ```
