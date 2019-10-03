@@ -43,6 +43,10 @@ module.exports = class Databases {
     return mongoose.Types;
   }
 
+  static get types() {
+    return mongoose.Types;
+  }
+
   static connect() {
     if(typeof process.env.MONGODB === 'undefined') {
       logger.error('MongoDB database not set.');
