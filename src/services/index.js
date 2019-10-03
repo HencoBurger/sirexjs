@@ -6,21 +6,21 @@ const path = require('path');
 module.exports = class Services {
 
   get model() {
-    const model = require(`${process.cwd()}/src/services/${this.serviceName}/model`);
+    try {
+      const model = require(`${process.cwd()}/src/services/${this.serviceName}/model`);
 
-    return new model();
+      return new model();
+    } catch(e) {
+      logger.error(`[core][services][model] ${e}`);
+      throw e;
+    }
   }
 
-  manager(managerName, method, properties = {}) {
+  manager(managerName) {
     try {
-      const managerInstance = require(`${process.cwd()}/src/services/${this.serviceName}/managers/${managerName}`);
-      if(typeof method !== 'undefined') {
-        return managerInstance[method](properties);
-      } else {
-        return manager;
-      }
+      return require(`${process.cwd()}/src/services/${this.serviceName}/managers/${managerName}`);
     } catch(e) {
-      logger.error(`[core][services] ${e}`);
+      logger.error(`[core][services][manager] ${e}`);
       throw e;
     }
   }
