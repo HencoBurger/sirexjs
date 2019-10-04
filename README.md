@@ -4,19 +4,17 @@ Service layer architecture for Express. Sir-(vice) Ex-(press)
 </br>
 SirexJs is not a new "framework", but more of a way of using Express to build API's.</br>
 Like the Express website says "Express is a fast, unopinionated, minimalist web framework for Node.js.</br>
-SirexJs is my opinion on how to use Express.
+SirexJs is an opinion on how build API's with Express.
 
-#### What is a service?
+#### Inspiration
 
-SirexJs was inspired by the Microservice architecture. <br/>
-You can think of a SirexJs service as a stand-alone:
-feature or grouping of code
-with its own routing table
-that connects to one database model.
+SirexJs was inspired by the Microservices architecture. <br/>
+You can think of a SirexJs services as a:<br/>
+Stand-alone feature or grouping of code with its own routing table that connects to one database model.  Services can also talk to one another through a service gateway.
 
 ## CLI
 ### Install
-Install Sirexjs globally.
+Install SirexJs globally.
 
 <code>
 npm i -g sirexjs
@@ -30,19 +28,13 @@ sirexjs
 Choose from the following options.
 
 - **init - Create new project.<br/>**
-  Navigate to your project folder or ask Sirex to create a new project folder structure for you.
+  Navigate to your project folder or ask SirexJs to create a new project folder structure for you.
 - **service - Create new service.<br/>**
   Use this option to create the folder structure and initial code to start developing your new service.
 - **middleware - Create new middleware.<br/>**
   Creates a middleware template function in "src/middleware".
 
-### Creating a new project
-This option creates and new express application with predefined folder structure.  The creation process also pre-installs all the packages you would need to get an API up and running.
-
-### Services
-Creating a new feature is sometimes a tedious process, using the CLI “service” options creates a new service in the main services folder also with a predefined folder structure.
-
-### Getting started
+### Getting Started
 Create a new service called “user” with an attached API end-point and save data to MongoDB.
 
 - [Create Service](#create-service)
@@ -51,23 +43,28 @@ Create a new service called “user” with an attached API end-point and save d
 - [Managers](#managers)
 - [Models](#models)
 - [Access Mongoose Types](#access-mongoose-types)
+- [Global extensions](#global-extensions)
+  - [Logging](#logging)
+  - [Validation](#validation)
+  - [Exceptions](#exceptions)
+  - [API Response](#api-response)
 
 Inside the project folder run:
-
-#### Create Service
 
 <code>
 sirexjs
 </code>
 
-Choose the options “service - Create new service” follow prompts and create user service.<br/>
-After the service is completed you can pretty much use ther service for what ever you want.<br/>
-It can be used as a service that is attached to a API end-point or you can use for a stand-alone collection of code that can be used in you API application.
+#### Create a Service
+
+Choose the options “service - Create new service” follow prompts and create "user" service.<br/>
+After creation is completed you can pretty much use the service for what ever you want.<br/>
+It can be used as a service that is attached to a API end-point or you can use for a stand-alone collection of code that can be used inside you API application.
 
 Follow the next steps to attach the service to a API end-point and save data to MongoDB.
 
 #### Service Route
-Add the following router to a service.
+Adding the following route gives you access to the service sub routes.
 
 <code>router.use('/user', serviceGateway.user.routes);</code>
 
@@ -148,8 +145,8 @@ module.exports = (function () {
 
 Service manager contains logic to manipulate data before you save it to a database or use the manipulated data in other parts of your application.
 
-You can access to the manager through the "serviceGateway".<br/>
-<code>serviceGateway.serviceName.manager('managerName');</code>
+You can access the manager through the "serviceGateway".<br/>
+<code>serviceGateway.serviceName.manager('managerFileLocation/managerFileName');</code>
 
 Example:
 ```
@@ -224,16 +221,10 @@ module.exports = class UserModel extends sirexjs.Database.mongodb {
     return schema;
   }
 
-  /**
-   * Create new user
-   * @param  {Object}  userData User data
-   * @return {Promise}          Response
-   */
   async createUser(userData) {
     try {
       let user = await this.collection.create(userData);
       user = await this.collection.find({ _id: this.types.ObjectId(user._id) });
-      console.log(user);
       return user;
     } catch (e) {
       logger.error("[UserModel][createUser]", e);
@@ -244,20 +235,15 @@ module.exports = class UserModel extends sirexjs.Database.mongodb {
 ```
 
 #### Access Mongoose Types
-Example - Inside models
+Example - Inside data model file
 
 ```
   async updateUser(id, userData) {
-    try {
-      return await this.collection.updateOne({ _id: this.types.ObjectId(id) }, userData);
-    } catch (e) {
-      logger.error("[UserModel][updateUser]", e);
-      throw e;
-    }
+    await this.collection.updateOne({ id: this.types.ObjectId(id) }, userData);
   }
 ```
 
-Example - Outside model
+Example - Outside data model file
 
 ```
 const serviceGateway = require('services');
@@ -273,13 +259,14 @@ module.exports = (id) => {
 These methods are globally accessible and are there to make your development process easier.
 
 ##### Logging
-Logger is and extension of [Winston](https://www.npmjs.com/package/winston) for more about how to use Winston go the the previous link.
+Logger is and extension of Winston. For more about how to use logger go [here](https://www.npmjs.com/package/winston).
 
+Examples: <br/>
 <code>logger.info("Info logs here");</code><br/>
 <code>logger.error("Error logs here");</code>
 
 ##### Validation
-Valodation was built using [validator](https://www.npmjs.com/package/validator). It was modified to by a bit more compaced.
+Validation uses [validator](https://www.npmjs.com/package/validator) internally. It was modified to be a bit more compact.
 
 ```
 const validate = validation();
@@ -301,7 +288,6 @@ if (validate.isValid(data)) {
 
 Types:
 
-- required
 - string
 - integer
 - float
@@ -311,20 +297,32 @@ Types:
 You can pipe types. Require a field and type:
 
 ```
+  'userName': {
+    'rules': 'string'
+  },
   'email': {
     'rules': 'required|email'
   }
 ```
 
 ##### Exceptions
-API response and exceptions work together. Make sure all exceptions caught is eventually passed to the route response.
+API response and exceptions work together. Make sure all exceptions caught is eventually passed to the route response for API end-points to display any error messages.
 
 Example: <br/>
-exception(response_cde, 'Description', colleciton_of_errors); <br/>
+exception(http_response_code, 'Description', colleciton_of_errors); <br/>
 
-<code> throw exceptions(404, 'Could not create new user', validate.errors); </code>
+<code> throw exceptions(400, 'Could not create new user', validate.errors); </code>
 
-##### API response
+##### API Response
 Display data back to users.
 <br/>Data displayed
 <code>res.restResponse(responseData);</code>
+
+Example:
+```
+try {
+  res.restResponse(user);
+} catch(e) {
+  res.restResponse(e);
+}
+```
