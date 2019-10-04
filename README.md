@@ -244,7 +244,7 @@ module.exports = class UserModel extends sirexjs.Database.mongodb {
 ```
 
 #### Access Mongoose Types
-Example - inside models
+Example - Inside models
 
 ```
   async updateUser(id, userData) {
@@ -268,3 +268,63 @@ module.exports = (id) => {
   await serviceGateway.user.model.collection.updateOne({ _id: types.ObjectId(id) }, { callsign: 'Boo' });
 }
 ```
+
+#### Global extensions
+These methods are globally accessible and are there to make your development process easier.
+
+##### Logging
+Logger is and extension of [Winston](https://www.npmjs.com/package/winston) for more about how to use Winston go the the previous link.
+
+<code>logger.info("Info logs here");</code><br/>
+<code>logger.error("Error logs here");</code>
+
+##### Validation
+Valodation was built using [validator](https://www.npmjs.com/package/validator). It was modified to by a bit more compaced.
+
+```
+const validate = validation();
+validate.setValidFields({
+  'callsign': {
+    'rules': 'required'
+  },
+  'email': {
+    'rules': 'required|email'
+  }
+});
+
+if (validate.isValid(data)) {
+  logger.info(validate.fields);
+} else {
+  throw exceptions(404, 'Could not create new user', validate.errors);
+}
+```
+
+Types:
+
+- required
+- string
+- integer
+- float
+- boolean
+- date
+
+You can pipe types. Require a field and type:
+
+```
+  'email': {
+    'rules': 'required|email'
+  }
+```
+
+##### Exceptions
+API response and exceptions work together. Make sure all exceptions caught is eventually passed to the route response.
+
+Example: <br/>
+exception(response_cde, 'Description', colleciton_of_errors); <br/>
+
+<code> throw exceptions(404, 'Could not create new user', validate.errors); </code>
+
+##### API response
+Display data back to users.
+<br/>Data displayed
+<code>res.restResponse(responseData);</code>
