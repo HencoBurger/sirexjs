@@ -48,8 +48,10 @@ module.exports = class Databases {
   }
 
   static connect() {
+
     if(typeof process.env.MONGODB === 'undefined') {
       logger.error('MongoDB database not set.');
+      process.db_status.mongodb = false;
       return false
     }
     mongoose.connect(
@@ -59,8 +61,10 @@ module.exports = class Databases {
     });
 
     mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
-    mongoose.connection.once('open', function() {
+    mongoose.connection.once('open', () => {
       logger.info('MongoDB connected');
+      process.db_status.mongodb = true;
+      return true;
     });
   }
 

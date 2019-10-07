@@ -38,6 +38,10 @@ module.exports = class Services {
 
   static load() {
     try {
+
+      const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
+      // TODO check between mongodb and mysql
+      sirexjs.Database.mongodb.connect();
       // Get all services
       const folderPath = process.cwd();
 
