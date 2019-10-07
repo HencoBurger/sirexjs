@@ -79,7 +79,7 @@ class Threads {
 
 };
 
-export default {
+module.exports = {
   _treads: null,
   create(exeProcess) {
     if (this._treads === null) {

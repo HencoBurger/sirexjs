@@ -6,7 +6,7 @@ const factory = {
   'exceptions': require(`./exceptions`),
   'routeRequest': require(`./routeRequest`),
   'validation': require(`./validation`),
-  'thread': require(`./thread`)
+  'threads': require(`./threads`)
 }
 
 module.exports = () => {
