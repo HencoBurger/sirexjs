@@ -184,4 +184,4 @@ class Validate {
 
 };
 
-module.exports = () => { console.log('Validation');return new Validate(); };
+module.exports = () => { return new Validate(); };
