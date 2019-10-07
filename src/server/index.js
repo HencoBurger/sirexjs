@@ -25,9 +25,6 @@ module.exports.load = (hooks = {}) => {
   const routes = require(`${process.cwd()}/src/router/index`);
   const cors = require(`${process.cwd()}/node_modules/cors`);
 
-  // TODO check between mongodb and mysql
-  sirexjs.Database.mongodb.connect();
-
   // Setup app to use CORS
   app.use(cors());
 
@@ -50,12 +47,21 @@ module.exports.load = (hooks = {}) => {
     hooks.beforeCreate(app);
   }
 
-  app.listen(process.env.APP_PORT, function() {
-    logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
-    logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
-    if (typeof hooks.created !== 'undefined' && typeof hooks.created === 'function') {
-      hooks.created(app);
-    }
-  });
+  // Check to see if the databases are ready to be used by application
+  let dbConnect = setInterval(() => {
 
+    let dbStatus = process.db_status;
+    if(dbStatus.mongodb !== null && dbStatus.mysql !== null) {
+      // Spin up application after db connected
+      app.listen(process.env.APP_PORT, function() {
+        logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
+        logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
+        if (typeof hooks.created !== 'undefined' && typeof hooks.created === 'function') {
+          hooks.created(app);
+        }
+      });
+
+      clearInterval(dbConnect);
+    }
+  },1);
 }
