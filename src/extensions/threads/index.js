@@ -2,14 +2,20 @@
 
 const path = require('path');
 const childProcess = require('child_process');
+const moment = require('moment');
 
 class Threads {
 
-  constructor(runProcess) {
+  constructor() {
     try {
       this.thread = null;
 
-      this.thread = childProcess.fork(`${process.cwd()}/${runProcess}`, []);
+      this.thread = childProcess.fork(`${__dirname}/load.js`, [
+        // runService
+      ], {
+        'cwd': process.cwd(),
+        'env': process.env
+      });
 
 
       return this;
@@ -20,17 +26,10 @@ class Threads {
     }
   }
 
-  send(input) {
+  send(payload) {
     return new Promise((resolve, reject) => {
-      console.log({
-        'local': true,
-        dirname: process.cwd(),
-        input: input
-      });
-      this.thread.send({
-        dirname: process.cwd(),
-        input: input
-      });
+
+      this.thread.send(payload);
 
       this.thread.on('message', (response) => {
         console.log(response);
@@ -80,29 +79,74 @@ class Threads {
 };
 
 module.exports = {
-  _treads: null,
-  create(exeProcess) {
-    if (this._treads === null) {
-      this._treads = {};
+  _treads: {},
+  run(exeProcess = '', arg = []) {
+
+    let currentThread = {};
+
+    if (Object.keys(this._treads).length === 0) {
+      currentThread = this.createThread();
+    } else {
+      for(let key in this._treads) {
+        let thread = this._treads[key];
+        if(tread.status === 'idle') {
+          currentThread = this.assignThread(thread);
+        }
+      }
     }
 
-    if (typeof this._treads[exeProcess] === 'undefined') {
-      this._treads[exeProcess] = new Threads(exeProcess);
+    if(
+      typeof exeProcess !== 'undefined'
+    ) {
+      console.log('send thread');
+      currentThread.childProcess.send({'exeProcess': exeProcess, 'arg': arg});
     }
-
-    return this._treads[exeProcess];
+    console.log('child process',currentThread.childProcess);
+    return currentThread.childProcess;
   },
-  tread(exeProcess) {
+  createThread() {
+    let timestamp = moment().format('x');
 
-    let tread = null;
+    this._treads[timestamp] = {
+      'status': 'active',
+      'created_at': timestamp,
+      'updated_at': timestamp,
+      'childProcess': new Threads()
+    };
 
-    if (typeof this._treads[exeProcess] !== 'undefined') {
-      tread = this._treads[exeProcess];
-    }
-
-    return tread;
+    return this._treads[timestamp];
   },
+  assignThread(thread) {
+    let timestamp = moment().format('x');
+
+    thread.status = 'active';
+    thread.updated_at = timestamp;
+
+    return thread;
+  },
+  // tread(exeProcess) {
+  //
+  //   let tread = null;
+  //
+  //   if (typeof this._treads[exeProcess] !== 'undefined') {
+  //     tread = this._treads[exeProcess].childProcess;
+  //   }
+  //
+  //   return tread;
+  // },
   list() {
     return (this._treads === null) ? [] : Object.keys(this._treads);
   }
 }
+
+setInterval(() => {
+  let timestamp = moment().subtract(3, 'seconds').format('x');
+  for(let key in this._treads) {
+    let thread = this._treads[key];
+
+    if(tread.status === 'idle' && thread.updated_at < timestamp) {
+      tread.childProcess.kill();
+      console.log('kill process', tread.created_at);
+    }
+  }
+}, 3000);
