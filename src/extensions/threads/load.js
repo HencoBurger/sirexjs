@@ -18,12 +18,9 @@ let run = async (payload) => {
         method = method[dot]
       }
     }
-
-    let result = await method(payload.arg);
-    console.log(result);
-    // method(payload.arg);
+    console.log(method(payload.arg));
+    process.send(method(payload.arg));
   }
-  process.send({ result: result });
 };
 
 

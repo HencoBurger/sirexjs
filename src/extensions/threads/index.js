@@ -8,9 +8,14 @@ class Threads {
 
   constructor() {
     try {
-      this.thread = null;
 
-      this.thread = childProcess.fork(`${__dirname}/load.js`, [
+      let timestamp = moment().format('x');
+
+      this._status = 'active';
+      this._created_at = timestamp,
+      this._updated_at = timestamp,
+
+      this._thread = childProcess.fork(`${__dirname}/load.js`, [
         // runService
       ], {
         'cwd': process.cwd(),
@@ -20,133 +25,191 @@ class Threads {
 
       return this;
     } catch (e) {
-      console.error('[MultiThread][constructor]');
-      console.error(e);
       throw e;
     }
   }
 
+  set status(value) {
+    this._status =  value;
+  }
+
+  get status() {
+    return this._status;
+  }
+
+  set created_at(value) {
+    this._created_at =  value;
+  }
+
+  get created_at() {
+    return this._created_at;
+  }
+
+  set updated_at(value) {
+    this._updated_at =  value;
+  }
+
+  get updated_at() {
+    return this._updated_at;
+  }
+
+  kill() {
+    return this._thread.kill();
+  }
+
   send(payload) {
-    return new Promise((resolve, reject) => {
+    try {
+      return new Promise((resolve, reject) => {
+        let timestamp = moment().format('x');
+        this.updated_at = timestamp;
+        this.status = 'active';
+        this._thread.send(payload);
 
-      this.thread.send(payload);
+        this._thread.on('message', (response) => {
+          console.log(response);
+          this.status = 'idle';
+          resolve(response);
+        });
 
-      this.thread.on('message', (response) => {
-        console.log(response);
-        resolve(response);
+        this._thread.on('error', (error) => {
+          this.status = 'idle';
+          reject(error);
+          console.error('Worker errored:', error);
+          // this._thread.kill(SIGTERM);
+          this._thread.kill();
+        });
+
+        this._thread.on('exit', function(exit) {
+          this.status = 'idle';
+          console.info(exit);
+          reject(exit);
+          console.info('Worker has been terminated.');
+        });
       });
-
-      this.thread.on('error', (error) => {
-        reject(error);
-        console.error('Worker errored:', error);
-        // this.thread.kill(SIGTERM);
-        this.thread.kill();
-      });
-
-      this.thread.on('exit', function(exit) {
-        console.info(exit);
-        reject(exit);
-        console.info('Worker has been terminated.');
-      });
-    });
+    } catch(e) {
+      throw e;
+    }
   }
 
   received(callback) {
+    try {
     // return new Promise((resolve, reject) => {
-      this.thread.on('message', (response) => {
+      this._thread.on('message', (response) => {
+        this.status = 'idle';
         console.log(response);
         callback(false, response);
         // resolve(response);
       });
 
-      this.thread.on('error', (error) => {
+      this._thread.on('error', (error) => {
+        this.status = 'idle';
         callback(error, null);
         // reject(error);
         console.error('Worker errored:', error);
-        // this.thread.kill(SIGTERM);
-        this.thread.kill();
+        // this._thread.kill(SIGTERM);
+        this._thread.kill();
       });
 
-      this.thread.on('exit', (exit) => {
+      this._thread.on('exit', (exit) => {
+        this.status = 'idle';
         console.info(exit);
         callback(exit, null);
         // reject(exit);
         console.info('Worker has been terminated.');
       });
-    // });
+    } catch(e) {
+      throw e;
+    }
   }
 
 };
 
-module.exports = {
-  _treads: {},
+ const threadList = {
+  _threads: [],
   run(exeProcess = '', arg = []) {
+    try {
 
-    let currentThread = {};
+      let currentThread = null;
 
-    if (Object.keys(this._treads).length === 0) {
-      currentThread = this.createThread();
-    } else {
-      for(let key in this._treads) {
-        let thread = this._treads[key];
-        if(tread.status === 'idle') {
-          currentThread = this.assignThread(thread);
+      if (this._threads.length === 0) {
+        currentThread = new Threads();
+        this._threads.push(currentThread);
+        // currentThread = this.createThread();
+      } else {
+        console.log(this._threads);
+        for(let thread of this._threads) {
+          if(thread.status === 'idle') {
+            currentThread = thread;
+          }
         }
       }
+
+      if(currentThread == null) {
+        currentThread = new Threads();
+        this._threads.push(currentThread);
+      }
+
+      if(
+        typeof exeProcess !== 'undefined'
+      ) {
+        currentThread.send({'exeProcess': exeProcess, 'arg': arg});
+      }
+
+      return currentThread;
+    } catch(e) {
+      console.log(e);
+      throw e;
     }
-
-    if(
-      typeof exeProcess !== 'undefined'
-    ) {
-      console.log('send thread');
-      currentThread.childProcess.send({'exeProcess': exeProcess, 'arg': arg});
-    }
-    console.log('child process',currentThread.childProcess);
-    return currentThread.childProcess;
   },
-  createThread() {
-    let timestamp = moment().format('x');
-
-    this._treads[timestamp] = {
-      'status': 'active',
-      'created_at': timestamp,
-      'updated_at': timestamp,
-      'childProcess': new Threads()
-    };
-
-    return this._treads[timestamp];
-  },
-  assignThread(thread) {
-    let timestamp = moment().format('x');
-
-    thread.status = 'active';
-    thread.updated_at = timestamp;
-
-    return thread;
-  },
-  // tread(exeProcess) {
+  // createThread() {
+  //   try {
+  //     let timestamp = moment().format('x');
   //
-  //   let tread = null;
+  //     let newThread = {
+  //       'status': 'active',
+  //       'created_at': timestamp,
+  //       'updated_at': timestamp,
+  //       'childProcess': new Threads()
+  //     };
   //
-  //   if (typeof this._treads[exeProcess] !== 'undefined') {
-  //     tread = this._treads[exeProcess].childProcess;
+  //     this._threads.push(newThread);
+  //
+  //     return newThread;
+  //   } catch(e) {
+  //     console.log(e);
+  //     throw e;
   //   }
-  //
-  //   return tread;
   // },
-  list() {
-    return (this._treads === null) ? [] : Object.keys(this._treads);
-  }
+  // assignThread(thread) {
+  //   try {
+  //     let timestamp = moment().format('x');
+  //
+  //     thread.status = 'active';
+  //     thread.updated_at = timestamp;
+  //
+  //     return thread;
+  //   } catch(e) {
+  //     console.log(e);
+  //     throw e;
+  //   }
+  // },
+  // list() {
+  //   return (this._threads === null) ? [] : Object.keys(this._threads);
+  // }
 }
 
 setInterval(() => {
   let timestamp = moment().subtract(3, 'seconds').format('x');
-  for(let key in this._treads) {
-    let thread = this._treads[key];
+  for(let key in threadList._threads) {
+    let thread = threadList._threads[key];
+    // let thread = this._threads[key];
 
-    if(tread.status === 'idle' && thread.updated_at < timestamp) {
-      tread.childProcess.kill();
-      console.log('kill process', tread.created_at);
+    if(thread.status === 'idle' && thread.updated_at < timestamp) {
+      thread.kill();
+      console.log('kill process', thread.created_at);
+      threadList._threads.splice(key);
     }
   }
 }, 3000);
+
+module.exports = threadList;
