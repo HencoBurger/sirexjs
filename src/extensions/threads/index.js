@@ -4,24 +4,42 @@ const path = require('path');
 const childProcess = require('child_process');
 const moment = require('moment');
 
-class Threads {
+class Thread {
 
   constructor() {
     try {
 
       let timestamp = moment().format('x');
+      this._threadMessage = null;
+      this._threadMessageRx = false;
+      this._threadError = null;
+      this._threadErrorRx = false;
+      this._threadExit = null;
+      this._threadExitRx = false;
 
       this._status = 'active';
       this._created_at = timestamp,
-      this._updated_at = timestamp,
+        this._updated_at = timestamp,
 
-      this._thread = childProcess.fork(`${__dirname}/load.js`, [
-        // runService
-      ], {
-        'cwd': process.cwd(),
-        'env': process.env
+        this._thread = childProcess.fork(`${__dirname}/load.js`, [
+          // runService
+        ], {
+          'cwd': process.cwd(),
+          'env': process.env
+        });
+
+      this._thread.on('message', (response) => {
+        this._threadMessageRx = true;
+        this.status = 'idle';
+        console.log('event receive');
+        this._threadMessage = response;
+        console.log('response: ', this._threadMessage);
+        console.log('_threadMessageRx :', this._threadMessageRx);
       });
 
+      this._thread.on('error', this.onError);
+
+      this._thread.on('exit', this.onExit);
 
       return this;
     } catch (e) {
@@ -29,8 +47,39 @@ class Threads {
     }
   }
 
+  onMessage(response) {
+    this._threadMessageRx = true;
+    this.status = 'idle';
+    console.log('event receive');
+    this._threadMessage = response;
+    console.log('response: ', this._threadMessage);
+    console.log('_threadMessageRx :', this._threadMessageRx);
+    // callback(false, response);
+  }
+
+  onError(error) {
+    this._threadErrorRx = true;
+    this.status = 'idle';
+    this._threadError = error;
+    // callback(error, null);
+    // this._thread.kill(SIGTERM);
+    this._thread.kill();
+  }
+
+  onExit(exit) {
+    this._threadExitRx = true;
+    this.status = 'idle';
+    this._threadExitRx = exit;
+    // callback(exit, null);
+  }
+
+
+  get timestamp() {
+    return moment().format('x');
+  }
+
   set status(value) {
-    this._status =  value;
+    this._status = value;
   }
 
   get status() {
@@ -38,7 +87,7 @@ class Threads {
   }
 
   set created_at(value) {
-    this._created_at =  value;
+    this._created_at = value;
   }
 
   get created_at() {
@@ -46,7 +95,7 @@ class Threads {
   }
 
   set updated_at(value) {
-    this._updated_at =  value;
+    this._updated_at = value;
   }
 
   get updated_at() {
@@ -59,72 +108,67 @@ class Threads {
 
   send(payload) {
     try {
-      return new Promise((resolve, reject) => {
-        let timestamp = moment().format('x');
-        this.updated_at = timestamp;
-        this.status = 'active';
-        this._thread.send(payload);
-
-        this._thread.on('message', (response) => {
-          console.log(response);
-          this.status = 'idle';
-          resolve(response);
-        });
-
-        this._thread.on('error', (error) => {
-          this.status = 'idle';
-          reject(error);
-          console.error('Worker errored:', error);
-          // this._thread.kill(SIGTERM);
-          this._thread.kill();
-        });
-
-        this._thread.on('exit', function(exit) {
-          this.status = 'idle';
-          console.info(exit);
-          reject(exit);
-          console.info('Worker has been terminated.');
-        });
-      });
-    } catch(e) {
+      // return new Promise((resolve, reject) => {
+      this.updated_at = this.timestamp;
+      this.status = 'active';
+      console.log('payload: ', payload);
+      this._thread.send(payload);
+    } catch (e) {
       throw e;
     }
   }
 
   received(callback) {
     try {
-    // return new Promise((resolve, reject) => {
-      this._thread.on('message', (response) => {
-        this.status = 'idle';
-        console.log(response);
-        callback(false, response);
-        // resolve(response);
+      this.updated_at = this.timestamp;
+      return new Promise((resolve, reject) => {
+        setInterval(() => {
+          if(this._threadMessageRx) {
+            console.log(1);
+            resolve(this._threadMessage);
+            callback(false, this._threadMessage);
+            this._threadMessageRx = false;
+          }
+          if(this._threadErrorRx) {
+            reject(this._threadError);
+            callback(this._threadError, false);
+            this._threadErrorRx = false;
+          }
+          if(this._threadExitRx) {
+            reject(this._threadExit);
+            callback(this._threadExit, false);
+            this._threadExitRx = false;
+          }
+        },1);
+        // this._thread.on('message', (response) => {
+        //   this.status = 'idle';
+        //   console.log('event receive');
+        //   callback(false, response);
+        //   resolve(response);
+        // });
+        //
+        // this._thread.on('error', (error) => {
+        //   this.status = 'idle';
+        //   callback(error, null);
+        //   // this._thread.kill(SIGTERM);
+        //   this._thread.kill();
+        //   reject(exit);
+        // });
+        //
+        // this._thread.on('exit', (exit) => {
+        //   this.status = 'idle';
+        //   callback(exit, null);
+        //   reject(exit);
+        // });
       });
-
-      this._thread.on('error', (error) => {
-        this.status = 'idle';
-        callback(error, null);
-        // reject(error);
-        console.error('Worker errored:', error);
-        // this._thread.kill(SIGTERM);
-        this._thread.kill();
-      });
-
-      this._thread.on('exit', (exit) => {
-        this.status = 'idle';
-        console.info(exit);
-        callback(exit, null);
-        // reject(exit);
-        console.info('Worker has been terminated.');
-      });
-    } catch(e) {
+    } catch (e) {
       throw e;
     }
   }
 
 };
 
- const threadList = {
+const threadCollection = {
   _threads: [],
   run(exeProcess = '', arg = []) {
     try {
@@ -132,84 +176,62 @@ class Threads {
       let currentThread = null;
 
       if (this._threads.length === 0) {
-        currentThread = new Threads();
+        currentThread = new Thread();
         this._threads.push(currentThread);
-        // currentThread = this.createThread();
       } else {
-        console.log(this._threads);
-        for(let thread of this._threads) {
-          if(thread.status === 'idle') {
+        for (let thread of this._threads) {
+          if (thread.status === 'idle') {
             currentThread = thread;
           }
         }
       }
 
-      if(currentThread == null) {
-        currentThread = new Threads();
+      if (currentThread == null) {
+        currentThread = new Thread();
         this._threads.push(currentThread);
       }
 
-      if(
+      if (
         typeof exeProcess !== 'undefined'
       ) {
-        currentThread.send({'exeProcess': exeProcess, 'arg': arg});
+        currentThread.send({
+          'exeProcess': exeProcess,
+          'arg': arg
+        });
       }
 
       return currentThread;
-    } catch(e) {
-      console.log(e);
+    } catch (e) {
+      console.error('[threads][index]', e);
       throw e;
     }
-  },
-  // createThread() {
-  //   try {
-  //     let timestamp = moment().format('x');
-  //
-  //     let newThread = {
-  //       'status': 'active',
-  //       'created_at': timestamp,
-  //       'updated_at': timestamp,
-  //       'childProcess': new Threads()
-  //     };
-  //
-  //     this._threads.push(newThread);
-  //
-  //     return newThread;
-  //   } catch(e) {
-  //     console.log(e);
-  //     throw e;
-  //   }
-  // },
-  // assignThread(thread) {
-  //   try {
-  //     let timestamp = moment().format('x');
-  //
-  //     thread.status = 'active';
-  //     thread.updated_at = timestamp;
-  //
-  //     return thread;
-  //   } catch(e) {
-  //     console.log(e);
-  //     throw e;
-  //   }
-  // },
-  // list() {
-  //   return (this._threads === null) ? [] : Object.keys(this._threads);
-  // }
+  }
 }
 
 setInterval(() => {
-  let timestamp = moment().subtract(3, 'seconds').format('x');
-  for(let key in threadList._threads) {
-    let thread = threadList._threads[key];
+  let timestamp = moment().subtract(5, 'seconds').format('x');
+  for (let key in threadCollection._threads) {
+    let thread = threadCollection._threads[key];
     // let thread = this._threads[key];
 
-    if(thread.status === 'idle' && thread.updated_at < timestamp) {
-      thread.kill();
+    if (thread.status === 'idle' && thread.updated_at < timestamp) {
       console.log('kill process', thread.created_at);
-      threadList._threads.splice(key);
+      thread.kill();
+      threadCollection._threads.splice(key);
     }
   }
-}, 3000);
+}, 5000);
 
-module.exports = threadList;
+class Threads {
+  constructor(exeProcess = '', arg = []) {
+    this._thread = threadCollection.run(exeProcess, arg);
+  }
+
+  received(callback) {
+    this._thread.received(callback)
+  }
+}
+
+module.exports = (exeProcess = '', arg = []) => {
+  return new Threads(exeProcess, arg);
+};
