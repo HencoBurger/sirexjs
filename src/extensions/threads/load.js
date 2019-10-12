@@ -1,7 +1,7 @@
 'use strict';
 require(`${process.cwd()}/node_modules/app-module-path`)
 .addPath(`${process.cwd()}/node_modules`);
-// console.log(`${process.cwd()}/node_modules/sirexjs`);
+
 const sirexjs = require(`sirexjs`);
 sirexjs.Extensions();
 const serviceGateway = sirexjs.Services.load();
@@ -9,9 +9,7 @@ const serviceGateway = sirexjs.Services.load();
 
 let run = async (payload) => {
   if(typeof payload.exeProcess !== 'undefined') {
-    console.log('payload', payload.exeProcess);
     let method = require(`${process.cwd()}/src${payload.exeProcess}`);
-    console.log('method', method);
     process.send(method(payload.arg));
   }
 };
