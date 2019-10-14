@@ -10,7 +10,7 @@ const serviceGateway = sirexjs.Services.load();
 let run = async (payload) => {
   if(typeof payload.exeProcess !== 'undefined') {
     let method = require(`${process.cwd()}/src${payload.exeProcess}`);
-    process.send(method(payload.arg));
+    process.send(method(...payload.arg));
   }
 };
 
@@ -26,6 +26,4 @@ process.on('message', (payload) => {
       clearInterval(dbConnect);
     }
   },1);
-
-
 });
