@@ -16,7 +16,7 @@ class Thread {
       this._threadErrorRx = false;
       this._threadExit = null;
       this._threadExitRx = false;
-      this._payload = {};
+      this._payload = null;
       this._status = status;
       this._created_at = timestamp;
       this._updated_at = timestamp;
@@ -96,7 +96,7 @@ class Thread {
   }
 
   kill() {
-    return this._thread.kill();
+    return this._thread.kill('SIGINT');;
   }
 
   setPayload(payload) {
@@ -105,43 +105,48 @@ class Thread {
 
   send() {
     try {
-      this.updated_at = this.timestamp;
-      this.status = 'active';
-      this._thread.send(this._payload);
+      if (this._payload !== null) {
+        this.updated_at = this.timestamp;
+        this.status = 'active';
+        this._thread.send(this._payload);
+        this._payload = null;
+      }
     } catch (e) {
       throw e;
     }
   }
 
-  received(callback) {
+  received() {
     try {
       return new Promise((resolve, reject) => {
-        setInterval(() => {
+        let receivedInterval = setInterval(() => {
           if (this._threadMessageRx) {
             this.status = 'idle';
             this.updated_at = this.timestamp;
+            console.log('this._threadMessageRx', this._threadMessageRx);
             resolve(this._threadMessage);
-            // callback(false, this._threadMessage);
+            console.log('this._threadMessage', this._threadMessage);
             this._threadMessageRx = false;
-
+            clearInterval(receivedInterval);
           }
           if (this._threadErrorRx) {
             this.status = 'idle';
             this.updated_at = this.timestamp;
             reject(this._threadError);
-            // callback(this._threadError, false);
             this._threadErrorRx = false;
+            clearInterval(receivedInterval);
           }
           if (this._threadExitRx) {
             this.status = 'idle';
             this.updated_at = this.timestamp;
             reject(this._threadExit);
-            // callback(this._threadExit, false);
             this._threadExitRx = false;
+            clearInterval(receivedInterval);
           }
-        }, 1);
+        }, 0);
       });
     } catch (e) {
+      console.error(e);
       throw e;
     }
   }
@@ -160,6 +165,7 @@ const threadCollection = {
         this._threads.push(currentThread);
       } else {
         for (let thread of this._threads) {
+          console.log(thread.status);
           if (thread.status === 'idle') {
             currentThread = thread;
           }
@@ -167,7 +173,7 @@ const threadCollection = {
       }
 
       if (currentThread == null) {
-        currentThread = new Thread();
+        currentThread = new Thread('pool');
         this._threads.push(currentThread);
       }
 
@@ -193,35 +199,45 @@ const treadLoop = () => {
   for (let key in threadCollection._threads) {
     let timestamp = moment().subtract(5, 'seconds').format('x');
     let thread = threadCollection._threads[key];
+
     // Create new thread and send the payload
     // Only initiate thread if pool is less and equel to 4
     if (thread.status === 'pool' && treadPoolCount <= 4) {
       thread.run();
       thread.send();
+    }
+    // console.log(thread.status === 'idle' && thread.updated_at > timestamp);
     // Process are killed ofter 5 seconds and inactivity
-    } else if (thread.status === 'idle' && thread.updated_at < timestamp) {
-      thread.status === 'kill';
+    if (thread.status === 'idle' && thread.updated_at < timestamp) {
+      thread.status = 'kill';
+      console.log(thread.status);
       thread.kill();
       threadCollection._threads.splice(key);
-    // Initiate thread as active
-    } else {
-      thread.status === 'active';
+      // Initiate thread as active
+    } else if (
+      thread.status !== 'kill' &&
+      thread.status !== 'pool'
+    ) {
       thread.send();
     }
+    console.log(treadPoolCount);
   }
 }
+
 // Function runs every miliseconds
-setInterval(treadLoop, 1);
+setInterval(treadLoop, 0);
 
 class Threads {
   constructor(exeProcess = '', arg = []) {
     this._thread = threadCollection.run(exeProcess, arg);
   }
 
-  received(callback) {
+  received() {
     return new Promise((resolve, reject) => {
-      this._thread.received(callback)
+      this._thread
+        .received()
         .then((result) => {
+          console.log('result', result);
           resolve(result);
         })
         .catch((e) => {
@@ -233,7 +249,5 @@ class Threads {
 }
 
 module.exports = (exeProcess = '', arg = []) => {
-
-  console.log(3333);
   return new Threads(exeProcess, arg);
 };
