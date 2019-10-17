@@ -6,6 +6,7 @@ const factory = {
   'exceptions': require(`./exceptions`),
   'routeRequest': require(`./routeRequest`),
   'validation': require(`./validation`),
+  'threads': require(`./threads`)
 }
 
 module.exports = () => {
@@ -13,14 +14,6 @@ module.exports = () => {
     let extention = {};
     for(let ext in factory) {
       let factoryItem = factory[ext];
-      console.log(ext);
-      // Check to se if its a class or a function.
-      // Classes gets instantiated
-      // if(factoryItem.name === '') {
-      //   extention[ext] = factoryItem;
-      // } else {
-      //   extention[ext] = function() { return new factoryItem() };
-      // }
       extention[ext] = factoryItem;
     }
 

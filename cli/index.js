@@ -6,6 +6,7 @@ const term = require('terminal-kit').terminal;
 const initProject = require('./initProject');
 const createService = require('./createService');
 const createMiddleware = require('./createMiddleware');
+const createThread = require('./createThread');
 
 module.exports = (() => {
   let setupOptions = {};
@@ -28,9 +29,10 @@ module.exports = (() => {
 `);
 
   var items = [
-    `init     Create new project.`,
-    `service  Create new service.`,
-    `middleware  Create new middleware.`
+    `init         Create new project.`,
+    `service      Create new service.`,
+    `middleware   Create new middleware.`,
+    `thread       Create new Child Process.`
   ];
 
   term.singleColumnMenu(items, async function(error, response) {
@@ -43,6 +45,9 @@ module.exports = (() => {
         break;
       case 2:
         createMiddleware();
+        break;
+      case 3:
+        createThread();
         break;
     }
     // process.exit() ;
