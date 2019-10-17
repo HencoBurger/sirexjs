@@ -46,8 +46,10 @@ Create a new service called “user” with an attached API end-point and save d
 - [Global extensions](#global-extensions)
   - [Logging](#logging)
   - [Validation](#validation)
+  - [Threads](#threads)
   - [Exceptions](#exceptions)
   - [API Response](#api-response)
+- [Threads (Child Process)](#threads)
 
 Inside the project folder run:
 
@@ -180,7 +182,6 @@ module.exports = class SignUp {
       });
 
       if (validate.isValid(body)) {
-        console.log(validate.fields);
         return await serviceGateway.user.model.createUser(validate.fields);
       } else {
         throw exceptions(404, 'Could not create new user', validate.errors);
@@ -303,6 +304,36 @@ You can pipe types. Require a field and type:
   'email': {
     'rules': 'required|email'
   }
+```
+##### Threads
+Node is single threaded and because of this any long running processes will block the event loop.  This creates latency in your application.  Using threads you can offload any long running process to a separate Child Process.
+
+Features:
+- New threads only spin up when requested.
+- Previously created threads are re-used as spinning up a thread takes about 2 seconds.
+- Idle threads waits for 5 seconds to be reused and then shuts down.
+- Max 4 threads can be running at the same time.
+- Request are placed in a "thread pool" if more than 4 threads are active.
+
+
+###### Using it as a global extension:
+```
+  let thread = await threads('location_of_function', ['arg1','arg2','arg3'])
+  .received();
+  // ex.
+  let thread = await threads('/services/user/managers/test', ['hello'])
+  .received();
+```
+###### Using it through service gateway:
+```
+const serviceGateway = require('services');
+
+  let thread = await serviceGateway.user.thread('thread_in_service_threads_folder',  ['arg1','arg2','arg3'])
+  .received();
+
+  //ex.
+  let thread = await serviceGateway.user.thread('test', ['arg1','arg2','arg3'])
+  .received();
 ```
 
 ##### Exceptions

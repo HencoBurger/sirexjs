@@ -3,6 +3,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const threads = require('../extensions/threads');
+
 module.exports = class Services {
 
   get model() {
@@ -20,7 +22,16 @@ module.exports = class Services {
     try {
       return require(`${process.cwd()}/src/services/${this.serviceName}/managers/${managerName}`);
     } catch(e) {
-      logger.error(`[core][services][manager] ${e}`);
+      logger.error(`[core][services][manager]`, e);
+      throw e;
+    }
+  }
+
+  thread(threadName, arg) {
+    try {
+      return threads(`/services/${this.serviceName}/threads/${threadName}`, arg);
+    } catch(e) {
+      logger.error(`[core][services][thread]`, e);
       throw e;
     }
   }

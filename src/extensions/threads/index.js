@@ -123,9 +123,7 @@ class Thread {
           if (this._threadMessageRx) {
             this.status = 'idle';
             this.updated_at = this.timestamp;
-            console.log('this._threadMessageRx', this._threadMessageRx);
             resolve(this._threadMessage);
-            console.log('this._threadMessage', this._threadMessage);
             this._threadMessageRx = false;
             clearInterval(receivedInterval);
           }
@@ -165,7 +163,6 @@ const threadCollection = {
         this._threads.push(currentThread);
       } else {
         for (let thread of this._threads) {
-          console.log(thread.status);
           if (thread.status === 'idle') {
             currentThread = thread;
           }
@@ -206,13 +203,11 @@ const treadLoop = () => {
       thread.run();
       thread.send();
     }
-    // console.log(thread.status === 'idle' && thread.updated_at > timestamp);
     // Process are killed ofter 5 seconds and inactivity
     if (thread.status === 'idle' && thread.updated_at < timestamp) {
       thread.status = 'kill';
-      console.log(thread.status);
       thread.kill();
-      threadCollection._threads.splice(key);
+      threadCollection._threads.splice(key, 1);
       // Initiate thread as active
     } else if (
       thread.status !== 'kill' &&
@@ -220,7 +215,6 @@ const treadLoop = () => {
     ) {
       thread.send();
     }
-    console.log(treadPoolCount);
   }
 }
 
@@ -237,7 +231,6 @@ class Threads {
       this._thread
         .received()
         .then((result) => {
-          console.log('result', result);
           resolve(result);
         })
         .catch((e) => {
