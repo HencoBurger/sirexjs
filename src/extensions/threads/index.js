@@ -96,7 +96,7 @@ class Thread {
   }
 
   kill() {
-    return this._thread.kill('SIGINT');;
+    return this._thread.kill('SIGINT');
   }
 
   setPayload(payload) {
@@ -149,9 +149,10 @@ class Thread {
     }
   }
 
-};
+}
 
 const threadCollection = {
+  _runningThreads: 0,
   _threads: [],
   run(exeProcess = '', arg = []) {
     try {
@@ -193,18 +194,21 @@ const threadCollection = {
 
 const treadLoop = () => {
   let treadPoolCount = threadCollection._threads.length;
+
   for (let key in threadCollection._threads) {
     let timestamp = moment().subtract(5, 'seconds').format('x');
     let thread = threadCollection._threads[key];
 
     // Create new thread and send the payload
     // Only initiate thread if pool is less and equel to 4
-    if (thread.status === 'pool' && treadPoolCount <= 4) {
+    if (thread.status === 'pool' && threadCollection._runningThreads <= 5) {
+      threadCollection._runningThreads = threadCollection._runningThreads + 1;
       thread.run();
       thread.send();
     }
     // Process are killed ofter 5 seconds and inactivity
     if (thread.status === 'idle' && thread.updated_at < timestamp) {
+      threadCollection._runningThreads = threadCollection._runningThreads - 1;
       thread.status = 'kill';
       thread.kill();
       threadCollection._threads.splice(key, 1);
