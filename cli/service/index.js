@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const path = require("path");
-const shell = require('shelljs');
 const term = require('terminal-kit').terminal;
 // const packageFile = require('./packageFile.js');
 const serviceData = require('../serviceData');

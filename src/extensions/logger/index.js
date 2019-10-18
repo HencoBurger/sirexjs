@@ -15,10 +15,10 @@ class Logging {
     });
   }
 
-  static get run() {
+  static run() {
     return new Logging();
   }
 
 }
 
-module.exports = Logging.run;
+module.exports = Logging.run();

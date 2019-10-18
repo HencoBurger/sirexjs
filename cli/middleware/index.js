@@ -1,12 +1,9 @@
 "use strict";
 
 const fs = require('fs');
-const path = require("path");
-const shell = require('shelljs');
 const term = require('terminal-kit').terminal;
 // const packageFile = require('./packageFile.js');
 const middlewareData = require('../middlewareData');
-const helpers = require('../helpers');
 
 module.exports = () => {
 

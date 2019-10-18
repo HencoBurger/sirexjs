@@ -1,14 +1,11 @@
 'use strict';
 
-const path = require('path');
 const childProcess = require('child_process');
 const moment = require('moment');
 
 class Thread {
 
   constructor(status) {
-    try {
-
       let timestamp = moment().format('x');
       this._threadMessage = null;
       this._threadMessageRx = false;
@@ -24,11 +21,6 @@ class Thread {
       if (status !== 'pool') {
         this.run();
       }
-
-      return this;
-    } catch (e) {
-      throw e;
-    }
   }
 
   run() {
@@ -104,15 +96,11 @@ class Thread {
   }
 
   send() {
-    try {
-      if (this._payload !== null) {
-        this.updated_at = this.timestamp;
-        this.status = 'active';
-        this._thread.send(this._payload);
-        this._payload = null;
-      }
-    } catch (e) {
-      throw e;
+    if (this._payload !== null) {
+      this.updated_at = this.timestamp;
+      this.status = 'active';
+      this._thread.send(this._payload);
+      this._payload = null;
     }
   }
 
@@ -193,8 +181,6 @@ const threadCollection = {
 }
 
 const treadLoop = () => {
-  let treadPoolCount = threadCollection._threads.length;
-
   for (let key in threadCollection._threads) {
     let timestamp = moment().subtract(5, 'seconds').format('x');
     let thread = threadCollection._threads[key];

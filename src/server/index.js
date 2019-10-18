@@ -15,10 +15,11 @@ module.exports.load = (hooks = {}) => {
   require(`${process.cwd()}/node_modules/app-module-path`).addPath(`${process.cwd()}/src`);
 
   const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
+
   // const router = require('core/router');
   const express = require(`${process.cwd()}/node_modules/express`);
   const app = express();
-  Object.assign(app, sirexjs.Extensions());
+  // Object.assign(app, sirexjs.Extensions());
 
   const fileUpload = require(`${process.cwd()}/node_modules/express-fileupload`);
   const bodyParser = require(`${process.cwd()}/node_modules/body-parser`);
@@ -34,10 +35,10 @@ module.exports.load = (hooks = {}) => {
   app.use(fileUpload()); // Upload files
 
   // Custom response for all reoutes
-  app.use(restResponse);
+  app.use(sirexjs.Extensions.restResponse);
 
   // View requests
-  app.use(routeRequest);
+  app.use(sirexjs.Extensions.routeRequest);
 
   let apiVersion = (typeof process.env.API_VERSION !== 'undefined') ? process.env.API_VERSION : '';
   // Load routing
@@ -54,8 +55,8 @@ module.exports.load = (hooks = {}) => {
     if(dbStatus.mongodb !== null && dbStatus.mysql !== null) {
       // Spin up application after db connected
       app.listen(process.env.APP_PORT, function() {
-        logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
-        logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
+        sirexjs.Extensions.logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
+        sirexjs.Extensions.logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
         if (typeof hooks.created !== 'undefined' && typeof hooks.created === 'function') {
           hooks.created(app);
         }

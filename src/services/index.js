@@ -1,9 +1,9 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
-
 const threads = require('../extensions/threads');
+const logger = require('../extensions/logger');
+const Database = require('../databases');
 
 module.exports = class Services {
 
@@ -49,10 +49,8 @@ module.exports = class Services {
 
   static load() {
     try {
-
-      const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
       // TODO check between mongodb and mysql
-      sirexjs.Database.mongodb.connect();
+      Database.mongodb.connect();
       // Get all services
       const folderPath = process.cwd();
 

@@ -9,7 +9,6 @@ const createMiddleware = require('./createMiddleware');
 const createThread = require('./createThread');
 
 module.exports = (() => {
-  let setupOptions = {};
 
   term(`
     \n\n\n\n
