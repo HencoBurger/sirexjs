@@ -1,6 +1,10 @@
 {
   "name": "sirexjs",
   "version": "0.4.0",
+  "engines": {
+    "node": ">=8.0.0"
+    "npm": ">=5.0.0"
+  },
   "description": "Service layer architecture for Express.js",
   "main": "index.js",
   "bin": {
