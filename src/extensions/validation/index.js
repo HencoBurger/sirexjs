@@ -182,6 +182,6 @@ class Validate {
     };
   }
 
-};
+}
 
 module.exports = () => { return new Validate(); };
