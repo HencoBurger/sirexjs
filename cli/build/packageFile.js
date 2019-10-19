@@ -30,7 +30,7 @@ module.exports = async (options) => {
     "moment": "2.24.0",
     "mongoose": "5.6.12",
     "winston": "3.2.1",
-    "sirexjs": "C:/\Users/\Henco/\Code/\sirexjs"
+    "sirexjs": "${options.sirex_version}"
   },
   "devDependencies": {
     "chai": "4.2.0",
@@ -126,18 +126,19 @@ module.exports = (() => {
     fs.mkdirSync(`${projectFolder}/src/router`);
     let routeIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/routeIndex.js"));
     fs.writeFileSync(`${projectFolder}/src/router/index.js`, routeIndex);
-    fs.writeFileSync(`${projectFolder}/src/router/README.md`, '');
+    fs.writeFileSync(`${projectFolder}/src/router/README.md`, 'Initial router');
 
     fs.mkdirSync(`${projectFolder}/src/services`);
-    fs.writeFileSync(`${projectFolder}/src/services/README.md`, '');
+    fs.writeFileSync(`${projectFolder}/src/services/README.md`, 'Home of all your created services.');
     let serviceIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/serviceIndex.js"));
     fs.writeFileSync(`${projectFolder}/src/services/index.js`, serviceIndex);
 
     fs.mkdirSync(`${projectFolder}/src/utilities`);
-    fs.writeFileSync(`${projectFolder}/src/utilities/README.md`, '');
+    fs.writeFileSync(`${projectFolder}/src/utilities/README.md`, `Place code here that doesn't really belong under a service, things like payment platform SDK or transactional email provider.
+      `);
 
     fs.mkdirSync(`${projectFolder}/test`);
-    fs.writeFileSync(`${projectFolder}/test/README.md`, '');
+    fs.writeFileSync(`${projectFolder}/test/README.md`, 'Put all the test for your code here.');
 
     if(process.cwd() !== projectFolder) {
       shell.cd(projectFolder);
