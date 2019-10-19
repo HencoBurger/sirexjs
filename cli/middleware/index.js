@@ -1,12 +1,9 @@
 "use strict";
 
 const fs = require('fs');
-const path = require("path");
-const shell = require('shelljs');
 const term = require('terminal-kit').terminal;
 // const packageFile = require('./packageFile.js');
 const middlewareData = require('../middlewareData');
-const helpers = require('../helpers');
 
 module.exports = () => {
 
@@ -23,7 +20,7 @@ module.exports = () => {
   }
 
   fs.writeFileSync(`${middlewareFolder}/index.js`,
-`'use strict';
+    `'use strict';
 
 // ${middlewareData.middleware_name} Middleware
 module.exports = function(req, res, done) {
@@ -34,4 +31,4 @@ module.exports = function(req, res, done) {
 `);
 
   process.exit();
-}
+};

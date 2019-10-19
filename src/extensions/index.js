@@ -7,9 +7,9 @@ const factory = {
   'routeRequest': require(`./routeRequest`),
   'validation': require(`./validation`),
   'threads': require(`./threads`)
-}
+};
 
-module.exports = () => {
+module.exports = (() => {
   try {
     let extention = {};
     for(let ext in factory) {
@@ -17,10 +17,8 @@ module.exports = () => {
       extention[ext] = factoryItem;
     }
 
-    Object.assign(global, extention);
-
     return extention;
   } catch(e) {
     console.error(e);
   }
-}
+})();

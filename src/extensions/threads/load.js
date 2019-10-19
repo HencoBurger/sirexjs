@@ -1,10 +1,9 @@
 'use strict';
 require(`${process.cwd()}/node_modules/app-module-path`)
-.addPath(`${process.cwd()}/node_modules`);
+  .addPath(`${process.cwd()}/node_modules`);
 
-const sirexjs = require(`sirexjs`);
-sirexjs.Extensions();
-const serviceGateway = sirexjs.Services.load();
+const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
+sirexjs.Services.load();
 
 
 let run = async (payload) => {

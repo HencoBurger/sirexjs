@@ -1,12 +1,9 @@
 "use strict";
 
 const fs = require('fs');
-const path = require("path");
-const shell = require('shelljs');
 const term = require('terminal-kit').terminal;
 // const packageFile = require('./packageFile.js');
 const threadData = require('../threadData');
-const helpers = require('../helpers');
 
 module.exports = () => {
 
@@ -37,7 +34,7 @@ module.exports = () => {
   }
 
   fs.writeFileSync(`${threadFolder}/index.js`,
-`'use strict';
+    `'use strict';
 
 // ${threadData.thread_name} Thread function
 module.exports = function() {
@@ -48,4 +45,4 @@ module.exports = function() {
 `);
 
   process.exit();
-}
+};

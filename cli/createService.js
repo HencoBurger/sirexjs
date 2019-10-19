@@ -10,17 +10,17 @@ module.exports = async () => {
       term(`\n\n\nService name: `);
 
       term.inputField({
-          autoCompleteMenu: false
-        },
-        async (error, input) => {
+        autoCompleteMenu: false
+      },
+      async (error, input) => {
 
-          serviceData.service_name = input;
+        serviceData.service_name = input;
 
-          await service();
-        }
+        await service();
+      }
       );
     }
-  }
+  };
 
   steps.getName();
 };

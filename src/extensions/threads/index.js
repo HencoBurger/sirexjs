@@ -1,33 +1,25 @@
 'use strict';
 
-const path = require('path');
 const childProcess = require('child_process');
 const moment = require('moment');
 
 class Thread {
 
   constructor(status) {
-    try {
+    let timestamp = moment().format('x');
+    this._threadMessage = null;
+    this._threadMessageRx = false;
+    this._threadError = null;
+    this._threadErrorRx = false;
+    this._threadExit = null;
+    this._threadExitRx = false;
+    this._payload = null;
+    this._status = status;
+    this._created_at = timestamp;
+    this._updated_at = timestamp;
 
-      let timestamp = moment().format('x');
-      this._threadMessage = null;
-      this._threadMessageRx = false;
-      this._threadError = null;
-      this._threadErrorRx = false;
-      this._threadExit = null;
-      this._threadExitRx = false;
-      this._payload = null;
-      this._status = status;
-      this._created_at = timestamp;
-      this._updated_at = timestamp;
-
-      if (status !== 'pool') {
-        this.run();
-      }
-
-      return this;
-    } catch (e) {
-      throw e;
+    if (status !== 'pool') {
+      this.run();
     }
   }
 
@@ -96,23 +88,19 @@ class Thread {
   }
 
   kill() {
-    return this._thread.kill('SIGINT');;
+    return this._thread.kill('SIGINT');
   }
 
   setPayload(payload) {
-    this._payload = payload
+    this._payload = payload;
   }
 
   send() {
-    try {
-      if (this._payload !== null) {
-        this.updated_at = this.timestamp;
-        this.status = 'active';
-        this._thread.send(this._payload);
-        this._payload = null;
-      }
-    } catch (e) {
-      throw e;
+    if (this._payload !== null) {
+      this.updated_at = this.timestamp;
+      this.status = 'active';
+      this._thread.send(this._payload);
+      this._payload = null;
     }
   }
 
@@ -149,9 +137,10 @@ class Thread {
     }
   }
 
-};
+}
 
 const threadCollection = {
+  _runningThreads: 0,
   _threads: [],
   run(exeProcess = '', arg = []) {
     try {
@@ -189,22 +178,23 @@ const threadCollection = {
       throw e;
     }
   }
-}
+};
 
 const treadLoop = () => {
-  let treadPoolCount = threadCollection._threads.length;
   for (let key in threadCollection._threads) {
     let timestamp = moment().subtract(5, 'seconds').format('x');
     let thread = threadCollection._threads[key];
 
     // Create new thread and send the payload
     // Only initiate thread if pool is less and equel to 4
-    if (thread.status === 'pool' && treadPoolCount <= 4) {
+    if (thread.status === 'pool' && threadCollection._runningThreads <= 5) {
+      threadCollection._runningThreads = threadCollection._runningThreads + 1;
       thread.run();
       thread.send();
     }
     // Process are killed ofter 5 seconds and inactivity
     if (thread.status === 'idle' && thread.updated_at < timestamp) {
+      threadCollection._runningThreads = threadCollection._runningThreads - 1;
       thread.status = 'kill';
       thread.kill();
       threadCollection._threads.splice(key, 1);
@@ -216,7 +206,7 @@ const treadLoop = () => {
       thread.send();
     }
   }
-}
+};
 
 // Function runs every miliseconds
 setInterval(treadLoop, 0);
@@ -237,7 +227,7 @@ class Threads {
           console.error(e);
           reject(e);
         });
-    })
+    });
   }
 }
 

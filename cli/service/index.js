@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const path = require("path");
-const shell = require('shelljs');
 const term = require('terminal-kit').terminal;
 // const packageFile = require('./packageFile.js');
 const serviceData = require('../serviceData');
@@ -23,7 +22,7 @@ module.exports = () => {
   }
 
   fs.writeFileSync(`${serviceFolder}/index.js`,
-`'use strict';
+    `'use strict';
 
 const sirexjs = require('sirexjs');
 
@@ -43,12 +42,12 @@ module.exports = (() => { return new ${helpers.capitalized(serviceData.service_n
 
   fs.mkdirSync(`${serviceFolder}/model`);
   fs.writeFileSync(`${serviceFolder}/model/schema.js`,
-`'use strict';
+    `'use strict';
 
 module.exports = {};
 `);
-fs.writeFileSync(`${serviceFolder}/model/index.js`,
-`'use strict';
+  fs.writeFileSync(`${serviceFolder}/model/index.js`,
+    `'use strict';
 
 const sirexjs = require('sirexjs');
 const schema = require('./schema');
@@ -64,15 +63,15 @@ module.exports = class ${helpers.capitalized(serviceData.service_name)}Model ext
   }
 }
 `);
-fs.mkdirSync(`${serviceFolder}/model/aggregations`);
-fs.writeFileSync(`${serviceFolder}/model/aggregations/index.js`,
-`'use strict';
+  fs.mkdirSync(`${serviceFolder}/model/aggregations`);
+  fs.writeFileSync(`${serviceFolder}/model/aggregations/index.js`,
+    `'use strict';
 
 module.exports = {};
 `);
 
-fs.mkdirSync(`${serviceFolder}/managers`);
-fs.writeFileSync(`${serviceFolder}/managers/README.md`,'# Business logic goes here.');
+  fs.mkdirSync(`${serviceFolder}/managers`);
+  fs.writeFileSync(`${serviceFolder}/managers/README.md`,'# Business logic goes here.');
 
   process.exit();
-}
+};

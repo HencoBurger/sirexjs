@@ -9,7 +9,6 @@ const createMiddleware = require('./createMiddleware');
 const createThread = require('./createThread');
 
 module.exports = (() => {
-  let setupOptions = {};
 
   term(`
     \n\n\n\n
@@ -32,23 +31,23 @@ module.exports = (() => {
     `init         Create new project.`,
     `service      Create new service.`,
     `middleware   Create new middleware.`,
-    `thread       Create new Child Process.`
+    `thread       Create new Service Child Process.`
   ];
 
   term.singleColumnMenu(items, async function(error, response) {
     switch (response.selectedIndex) {
-      case 0:
-        initProject();
-        break;
-      case 1:
-        createService();
-        break;
-      case 2:
-        createMiddleware();
-        break;
-      case 3:
-        createThread();
-        break;
+    case 0:
+      initProject();
+      break;
+    case 1:
+      createService();
+      break;
+    case 2:
+      createMiddleware();
+      break;
+    case 3:
+      createThread();
+      break;
     }
     // process.exit() ;
   });

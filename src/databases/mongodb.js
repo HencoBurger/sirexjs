@@ -1,19 +1,23 @@
 'use strict';
 
-var moment = require('moment');
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const moment = require('moment');
+const mongoose = require('mongoose');
+const logger = require('../extensions/logger');
+
+const Schema = mongoose.Schema;
 
 module.exports = class Databases {
 
   constructor() {
     try {
-
+      const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
+      console.log(sirexjs);
+      console.log(2);
       // Always make sure that the collection schema has created and updates at items set
       this.collectionSchema.createdAt = Date;
       this.collectionSchema.updatedAt = Date;
 
-      const schema = new Schema(this.collectionSchema)
+      const schema = new Schema(this.collectionSchema);
 
       // Middleware
       schema.pre('save', async function(next) {
@@ -33,8 +37,7 @@ module.exports = class Databases {
       }
 
     } catch (e) {
-      logger.error("[Databases]");
-      logger.error(JSON.stringify(e));
+      logger.error("[Databases]", e);
       throw e;
     }
   }
@@ -52,13 +55,13 @@ module.exports = class Databases {
     if(typeof process.env.MONGODB === 'undefined') {
       logger.error('MongoDB database not set.');
       process.db_status.mongodb = false;
-      return false
+      return false;
     }
     mongoose.connect(
-    process.env.MONGODB, {
-      poolSize: 10,
-      useNewUrlParser: true
-    });
+      process.env.MONGODB, {
+        poolSize: 10,
+        useNewUrlParser: true
+      });
 
     mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
     mongoose.connection.once('open', () => {
@@ -68,4 +71,4 @@ module.exports = class Databases {
     });
   }
 
-}
+};
