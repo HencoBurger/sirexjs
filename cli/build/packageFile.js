@@ -88,6 +88,13 @@ APP_PORT=3000
 MONGODB=mongodb://localhost:27017/your_db_name_here
 `);
 
+fs.writeFileSync(`${projectFolder}/.gitignore`,
+`/node_modules
+.env
+`);
+
+
+
     let mainIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/mainIndex.js"));
     fs.writeFileSync(`${projectFolder}/index.js`, mainIndex);
 
