@@ -33,17 +33,20 @@ Choose from the following options.
   Use this option to create the folder structure and initial code to start developing your new service.
 - **middleware - Create new middleware.<br/>**
   Creates a middleware template function in "src/middleware".
+- **thread - Create new Service Child Process.<br/>**
+  Creates a thread template function for a Service "src/services/[service_name]/threads/[thread_name]".
 
 ### Getting Started
 Create a new service called “user” with an attached API end-point and save data to MongoDB.
 
+- [Environment file](#environment-file)
 - [Create Service](#create-service)
 - [Service Route](#service-route)
 - [Sub Routes](#service-sub-routes)
 - [Managers](#managers)
 - [Models](#models)
 - [Access Mongoose Types](#access-mongoose-types)
-- [Global extensions](#global-extensions)
+- [Extensions](#extensions)
   - [Logging](#logging)
   - [Validation](#validation)
   - [Threads](#threads)
@@ -56,6 +59,9 @@ Inside the project folder run:
 <code>
 sirexjs
 </code>
+
+#### Environment file
+Creating a new application also creates an ".env-template" file. Rename this file to ".env" and add your relevant information.
 
 #### Create a Service
 
@@ -96,14 +102,16 @@ module.exports = (function () {
 Add sub-routes to a service
 
 ```
+const sirexjs = require('sirexjs');
+
 router.post('/sign-up', async (req, res) => {
     try {
       const signUp = serviceGateway.user.manager('SignUp');
       const user = await signUp.create(req.body);
-      res.restResponse(user);
+      res.restResponse(ussirexjs.Extensions.er);
     } catch(e) {
-      logger.error(`[services][user][routes][sign-up]`);
-      logger.error(e);
+      sirexjs.Extensions.sirexjs.Extensions.logger.error(`[services][user][routes][sign-up]`);
+      sirexjs.Extensions.logger.error(e);
       res.restResponse(e);
     }
   })
@@ -116,6 +124,7 @@ Example:<br/>
 
 const express = require('express');
 const router = express.Router();
+const sirexjs = require('sirexjs');
 
 // User authentication
 const middleware = require('middleware');
@@ -127,10 +136,10 @@ module.exports = (function () {
     try {
       const signUp = serviceGateway.user.manager('SignUp');
       const user = await signUp.create(req.body);
-      res.restResponse(user);
+      res.restResponse(ussirexjs.Extensions.er);
     } catch(e) {
-      logger.error(`[services][user][routes][sign-up]`);
-      logger.error(e);
+      sirexjs.Extensions.sirexjs.Extensions.logger.error(`[services][user][routes][sign-up]`);
+      sirexjs.Extensions.logger.error(e);
       res.restResponse(e);
     }
   })
@@ -166,6 +175,7 @@ Example - User Manager
 'user strict';
 
 const serviceGateway = require('services');
+const sirexjs = require('sirexjs');
 
 module.exports = class SignUp {
   static async create(body) {
@@ -184,10 +194,10 @@ module.exports = class SignUp {
       if (validate.isValid(body)) {
         return await serviceGateway.user.model.createUser(validate.fields);
       } else {
-        throw exceptions(404, 'Could not create new user', validate.errors);
+        throw sirexjs.Extensions.exceptions(404, 'Could not create new user', validate.errors);
       }
     } catch (e) {
-      logger.error("[managers][SignUp]", e);
+      sirexjs.Extensions.logger.error("[managers][SignUp]", e);
       throw e;
     }
   }
@@ -226,9 +236,9 @@ module.exports = class UserModel extends sirexjs.Database.mongodb {
     try {
       let user = await this.collection.create(userData);
       user = await this.collection.find({ _id: this.types.ObjectId(user._id) });
-      return user;
+      return ussirexjs.Extensions.er;
     } catch (e) {
-      logger.error("[UserModel][createUser]", e);
+      sirexjs.Extensions.logger.error("[UserModel][createUser]", e);
       throw e;
     }
   }
@@ -256,21 +266,29 @@ module.exports = (id) => {
 }
 ```
 
-#### Global extensions
-These methods are globally accessible and are there to make your development process easier.
+#### Extensions
+These methods are there to make your development process easier.
 
 ##### Logging
 Logger is and extension of Winston. For more about how to use logger go [here](https://www.npmjs.com/package/winston).
 
 Examples: <br/>
-<code>logger.info("Info logs here");</code><br/>
-<code>logger.error("Error logs here");</code>
+const sirexjs = require('sirexjs');
+
+```
+const sirexjs = require('sirexjs');
+
+sirexjs.Extensions.logger.info("Info logs here");
+sirexjs.Extensions.logger.error("Error logs here");
+```
 
 ##### Validation
 Validation uses [validator](https://www.npmjs.com/package/validator) internally. It was modified to be a bit more compact.
 
 ```
-const validate = validation();
+const sirexjs = require('sirexjs');
+const validate = sirexjs.Extensions.validation();
+
 validate.setValidFields({
   'callsign': {
     'rules': 'required'
@@ -281,9 +299,9 @@ validate.setValidFields({
 });
 
 if (validate.isValid(data)) {
-  logger.info(validate.fields);
+  sirexjs.Extensions.logger.info(validate.fields);
 } else {
-  throw exceptions(404, 'Could not create new user', validate.errors);
+  throw sirexjs.Extensions.exceptions(404, 'Could not create new user', validate.errors);
 }
 ```
 
@@ -312,16 +330,18 @@ Features:
 - New threads only spin up when requested.
 - Previously created threads are re-used as spinning up a thread takes about 2 seconds.
 - Idle threads waits for 5 seconds to be reused and then shuts down.
-- Max 4 threads can be running at the same time.
-- Request are placed in a "thread pool" if more than 4 threads are active.
+- Max 5 threads can be running at the same time.
+- Request are placed in a "thread pool" if more than 5 threads are active.
 
 
-###### Using it as a global extension:
+###### Using it as a extension:
 ```
-  let thread = await threads('location_of_function', ['arg1','arg2','arg3'])
+  const sirexjs = require('sirexjs');
+
+  let thread = await sirexjs.Extensions.threads('location_of_function', ['arg1','arg2','arg3'])
   .received();
   // ex.
-  let thread = await threads('/services/user/managers/test', ['hello'])
+  let thread = await sirexjs.Extensions.threads('/services/user/managers/test', ['hello'])
   .received();
 ```
 ###### Using it through service gateway:

@@ -31,7 +31,7 @@ module.exports = (() => {
     `init         Create new project.`,
     `service      Create new service.`,
     `middleware   Create new middleware.`,
-    `thread       Create new Child Process.`
+    `thread       Create new Service Child Process.`
   ];
 
   term.singleColumnMenu(items, async function(error, response) {

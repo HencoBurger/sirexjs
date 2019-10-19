@@ -79,8 +79,13 @@ ${options.description}
 `);
 
     fs.writeFileSync(`${projectFolder}/.env-temp`,
-      `# Environment variables go here.
+`# Environment variables go here.
 APP_NAME=${options.project_name}
+NODE_ENV=dev
+APP_PORT=3000
+
+# MongoDB URL
+MONGODB=mongodb://localhost:27017/your_db_name_here
 `);
 
     let mainIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/mainIndex.js"));
@@ -93,7 +98,7 @@ APP_NAME=${options.project_name}
 
     fs.mkdirSync(`${projectFolder}/src/middleware`);
     fs.writeFileSync(`${projectFolder}/src/middleware/index.js`,
-      `/*
+`/*
 
   DO NOT DELETE OR MODIFY THIS FILE
 
