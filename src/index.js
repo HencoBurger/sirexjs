@@ -6,4 +6,4 @@ module.exports = {
   Services: require('./services'),
   Server: require('./server'),
   Middleware: require('./middleware')
-}
+};

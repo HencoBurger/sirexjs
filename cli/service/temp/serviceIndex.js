@@ -11,5 +11,5 @@
 const sirexjs = require('sirexjs');
 
 module.exports = (() => {
- return sirexjs.Services.load();
-})()
+  return sirexjs.Services.load();
+})();

@@ -10,17 +10,17 @@ module.exports = async () => {
       term(`\n\n\nMiddleware name: `);
 
       term.inputField({
-          autoCompleteMenu: false
-        },
-        async (error, input) => {
+        autoCompleteMenu: false
+      },
+      async (error, input) => {
 
-          middlewareData.middleware_name = input;
+        middlewareData.middleware_name = input;
 
-          await middleware();
-        }
+        await middleware();
+      }
       );
     }
-  }
+  };
 
   steps.getName();
 };

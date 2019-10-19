@@ -32,4 +32,4 @@ module.exports = class Middleware {
       throw e;
     }
   }
-}
+};

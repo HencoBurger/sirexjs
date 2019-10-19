@@ -20,7 +20,7 @@ module.exports = () => {
   }
 
   fs.writeFileSync(`${middlewareFolder}/index.js`,
-`'use strict';
+    `'use strict';
 
 // ${middlewareData.middleware_name} Middleware
 module.exports = function(req, res, done) {
@@ -31,4 +31,4 @@ module.exports = function(req, res, done) {
 `);
 
   process.exit();
-}
+};

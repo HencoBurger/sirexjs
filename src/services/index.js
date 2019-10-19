@@ -76,4 +76,4 @@ module.exports = class Services {
       throw e;
     }
   }
-}
+};

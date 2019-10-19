@@ -65,4 +65,4 @@ module.exports.load = (hooks = {}) => {
       clearInterval(dbConnect);
     }
   },1);
-}
+};

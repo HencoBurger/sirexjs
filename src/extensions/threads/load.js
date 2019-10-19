@@ -1,6 +1,6 @@
 'use strict';
 require(`${process.cwd()}/node_modules/app-module-path`)
-.addPath(`${process.cwd()}/node_modules`);
+  .addPath(`${process.cwd()}/node_modules`);
 
 const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
 sirexjs.Services.load();

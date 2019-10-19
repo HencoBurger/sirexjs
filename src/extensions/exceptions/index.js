@@ -6,5 +6,5 @@ module.exports = (status = 500,  message = '', errors = []) => {
     'status': status,
     'message': message,
     'errors': errors
-  }
-}
+  };
+};

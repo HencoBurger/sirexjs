@@ -34,7 +34,7 @@ module.exports = () => {
   }
 
   fs.writeFileSync(`${threadFolder}/index.js`,
-`'use strict';
+    `'use strict';
 
 // ${threadData.thread_name} Thread function
 module.exports = function() {
@@ -45,4 +45,4 @@ module.exports = function() {
 `);
 
   process.exit();
-}
+};

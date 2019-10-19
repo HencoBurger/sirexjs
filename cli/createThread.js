@@ -10,14 +10,14 @@ module.exports = async () => {
       term(`\n\n\nThis thread is for which Service? `);
 
       term.inputField({
-          autoCompleteMenu: false
-        },
-        async (error, input) => {
+        autoCompleteMenu: false
+      },
+      async (error, input) => {
 
-          threadData.service_name = input;
+        threadData.service_name = input;
 
-          await steps.getThreadName();
-        }
+        await steps.getThreadName();
+      }
       );
 
 
@@ -26,17 +26,17 @@ module.exports = async () => {
       term(`\n\n\nThread name: `);
 
       term.inputField({
-          autoCompleteMenu: false
-        },
-        async (error, input) => {
+        autoCompleteMenu: false
+      },
+      async (error, input) => {
 
-          threadData.thread_name = input;
+        threadData.thread_name = input;
 
-          await thread();
-        }
+        await thread();
+      }
       );
     }
-  }
+  };
 
   steps.getServiceName();
 };

@@ -7,13 +7,14 @@ const term = require('terminal-kit').terminal;
 
 module.exports = async (options) => {
   try {
-  let defaultInitFile =
+    let defaultInitFile =
 `{
   "name": "${options.project_name}",
   "version": "${options.version}",
   "description": "${options.description}",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint --fix src/",
     "test": "mocha",
     "dev": "nodemon index.js --watch src/ --ignore node_modules/"
   },
@@ -33,44 +34,66 @@ module.exports = async (options) => {
   },
   "devDependencies": {
     "chai": "4.2.0",
+    "eslint": "6.5.1",
     "mocha": "6.2.0",
     "nodemon": "1.19.1"
   }
 }`;
 
-  let projectFolder = process.cwd();
+    let projectFolder = process.cwd();
 
-  if(options.create_project_folder) {
-    projectFolder = options.project_folder_name;
-    if(!fs.existsSync(projectFolder)) {
-      fs.mkdirSync(`${projectFolder}`);
-    } else {
-      term.red(`\n\n"${projectFolder}" Folder already exists!\n\n`);
-      process.exit();
-      return false;
+    if(options.create_project_folder) {
+      projectFolder = options.project_folder_name;
+      if(!fs.existsSync(projectFolder)) {
+        fs.mkdirSync(`${projectFolder}`);
+      } else {
+        term.red(`\n\n"${projectFolder}" Folder already exists!\n\n`);
+        process.exit();
+        return false;
+      }
     }
-  }
 
-fs.writeFileSync(`${projectFolder}/README.md`, `# ${options.project_name}
+    fs.writeFileSync(`${projectFolder}/README.md`, `# ${options.project_name}
 ${options.description}
 `);
 
-  fs.writeFileSync(`${projectFolder}/.env`,
-`# Environment variables go here.
+    fs.writeFileSync(`${projectFolder}/.eslintrc.json`, `{
+    "env": {
+        "commonjs": true,
+        "es6": true,
+        "node": true
+    },
+    "extends": "eslint:recommended",
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "rules": {
+        "semi": ["error", "always"],
+        "indent": ["error", 2]
+    }
+}
+`);
+
+    fs.writeFileSync(`${projectFolder}/.env-temp`,
+      `# Environment variables go here.
 APP_NAME=${options.project_name}
 `);
 
-  let mainIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/mainIndex.js"));
-  fs.writeFileSync(`${projectFolder}/index.js`, mainIndex);
+    let mainIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/mainIndex.js"));
+    fs.writeFileSync(`${projectFolder}/index.js`, mainIndex);
 
-  fs.writeFileSync(`${projectFolder}/package.json`, defaultInitFile);
+    fs.writeFileSync(`${projectFolder}/package.json`, defaultInitFile);
 
-  fs.mkdirSync(`${projectFolder}/src`);
-  fs.writeFileSync(`${projectFolder}/src/README.md`, '');
+    fs.mkdirSync(`${projectFolder}/src`);
+    fs.writeFileSync(`${projectFolder}/src/README.md`, '');
 
-  fs.mkdirSync(`${projectFolder}/src/middleware`);
-  fs.writeFileSync(`${projectFolder}/src/middleware/index.js`,
-`/*
+    fs.mkdirSync(`${projectFolder}/src/middleware`);
+    fs.writeFileSync(`${projectFolder}/src/middleware/index.js`,
+      `/*
 
   DO NOT DELETE OR MODIFY THIS FILE
 
@@ -86,31 +109,33 @@ module.exports = (() => {
  return sirexjs.Middleware.load();
 })();
 `);
-  fs.writeFileSync(`${projectFolder}/src/middleware/README.md`, '');
+    fs.writeFileSync(`${projectFolder}/src/middleware/README.md`, '');
 
-  fs.mkdirSync(`${projectFolder}/src/router`);
-  let routeIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/routeIndex.js"));
-  fs.writeFileSync(`${projectFolder}/src/router/index.js`, routeIndex);
-  fs.writeFileSync(`${projectFolder}/src/router/README.md`, '');
+    fs.mkdirSync(`${projectFolder}/src/router`);
+    let routeIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/routeIndex.js"));
+    fs.writeFileSync(`${projectFolder}/src/router/index.js`, routeIndex);
+    fs.writeFileSync(`${projectFolder}/src/router/README.md`, '');
 
-  fs.mkdirSync(`${projectFolder}/src/services`);
-  fs.writeFileSync(`${projectFolder}/src/services/README.md`, '');
-  let serviceIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/serviceIndex.js"));
-  fs.writeFileSync(`${projectFolder}/src/services/index.js`, serviceIndex);
+    fs.mkdirSync(`${projectFolder}/src/services`);
+    fs.writeFileSync(`${projectFolder}/src/services/README.md`, '');
+    let serviceIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/serviceIndex.js"));
+    fs.writeFileSync(`${projectFolder}/src/services/index.js`, serviceIndex);
 
-  fs.mkdirSync(`${projectFolder}/src/utilities`);
-  fs.writeFileSync(`${projectFolder}/src/utilities/README.md`, '');
+    fs.mkdirSync(`${projectFolder}/src/utilities`);
+    fs.writeFileSync(`${projectFolder}/src/utilities/README.md`, '');
 
-  fs.mkdirSync(`${projectFolder}/test`);
-  fs.writeFileSync(`${projectFolder}/test/README.md`, '');
+    fs.mkdirSync(`${projectFolder}/test`);
+    fs.writeFileSync(`${projectFolder}/test/README.md`, '');
 
-  if(process.cwd() !== projectFolder) {
-    shell.cd(projectFolder);
+    if(process.cwd() !== projectFolder) {
+      shell.cd(projectFolder);
+    }
+
+    shell.exec('npm i');
+    shell.exec('npm shrinkwrap');
+
+    term.green(`\n\nSetup and ready to go...`);
+  } catch(e) {
+    console.error(e);
   }
-
-  shell.exec('npm i');
-  term.green(`\n\nSetup and ready to go...`);
-} catch(e) {
-  console.error(e);
-}
-}
+};

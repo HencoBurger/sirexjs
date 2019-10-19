@@ -166,8 +166,8 @@ class Validate {
       var isValid = moment(data).isValid();
 
       if(data !== inputs[key]) {
-          error = true;
-          message = ' is not a valid date';
+        error = true;
+        message = ' is not a valid date';
       } else {
         if(!isValid) {
           error = true;

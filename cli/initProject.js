@@ -10,14 +10,14 @@ module.exports = async () => {
       term(`\n\n\nProject name: `);
 
       term.inputField({
-          autoCompleteMenu: false
-        },
-        (error, input) => {
+        autoCompleteMenu: false
+      },
+      (error, input) => {
 
-          setupData.project_name = input;
+        setupData.project_name = input;
 
-          steps.createFolder();
-        }
+        steps.createFolder();
+      }
       );
     },
     createFolder() {
@@ -42,50 +42,50 @@ module.exports = async () => {
     setProjectFolder() {
       term(`\nChoose folder name: `);
       term.inputField({
-          autoCompleteMenu: false
-        },
-        (error, input) => {
-          setupData.project_folder_name = input;
-          steps.version();
-        }
+        autoCompleteMenu: false
+      },
+      (error, input) => {
+        setupData.project_folder_name = input;
+        steps.version();
+      }
       );
     },
     version() {
       term(`\nVersion(0.1.0): `);
       term.inputField({
-          autoCompleteMenu: false
-        },
-        async (error, input) => {
-          if(input != '') {
-            setupData.version = input;
-          }
-          steps.description();
+        autoCompleteMenu: false
+      },
+      async (error, input) => {
+        if(input != '') {
+          setupData.version = input;
         }
+        steps.description();
+      }
       );
     },
     description() {
       term(`\nDescription: `);
       term.inputField({
-          autoCompleteMenu: false
-        },
-        async (error, input) => {
+        autoCompleteMenu: false
+      },
+      async (error, input) => {
 
-          setupData.description = input;
-          steps.author();
-        }
+        setupData.description = input;
+        steps.author();
+      }
       );
     },
     author() {
       term(`\nAuthor: `);
       term.inputField({
-          autoCompleteMenu: false
-        },
-        async (error, input) => {
+        autoCompleteMenu: false
+      },
+      async (error, input) => {
 
-          setupData.author = input;
+        setupData.author = input;
 
-          await steps.saveNpmPackageFile();
-        }
+        await steps.saveNpmPackageFile();
+      }
       );
 
     },
@@ -94,7 +94,7 @@ module.exports = async () => {
       await build();
       return true;
     }
-  }
+  };
 
   steps.getName();
 };

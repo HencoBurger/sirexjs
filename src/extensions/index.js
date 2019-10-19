@@ -7,7 +7,7 @@ const factory = {
   'routeRequest': require(`./routeRequest`),
   'validation': require(`./validation`),
   'threads': require(`./threads`)
-}
+};
 
 module.exports = (() => {
   try {

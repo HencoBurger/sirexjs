@@ -17,7 +17,7 @@ module.exports = class Databases {
       this.collectionSchema.createdAt = Date;
       this.collectionSchema.updatedAt = Date;
 
-      const schema = new Schema(this.collectionSchema)
+      const schema = new Schema(this.collectionSchema);
 
       // Middleware
       schema.pre('save', async function(next) {
@@ -55,13 +55,13 @@ module.exports = class Databases {
     if(typeof process.env.MONGODB === 'undefined') {
       logger.error('MongoDB database not set.');
       process.db_status.mongodb = false;
-      return false
+      return false;
     }
     mongoose.connect(
-    process.env.MONGODB, {
-      poolSize: 10,
-      useNewUrlParser: true
-    });
+      process.env.MONGODB, {
+        poolSize: 10,
+        useNewUrlParser: true
+      });
 
     mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
     mongoose.connection.once('open', () => {
@@ -71,4 +71,4 @@ module.exports = class Databases {
     });
   }
 
-}
+};

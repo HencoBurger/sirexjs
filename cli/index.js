@@ -36,18 +36,18 @@ module.exports = (() => {
 
   term.singleColumnMenu(items, async function(error, response) {
     switch (response.selectedIndex) {
-      case 0:
-        initProject();
-        break;
-      case 1:
-        createService();
-        break;
-      case 2:
-        createMiddleware();
-        break;
-      case 3:
-        createThread();
-        break;
+    case 0:
+      initProject();
+      break;
+    case 1:
+      createService();
+      break;
+    case 2:
+      createMiddleware();
+      break;
+    case 3:
+      createThread();
+      break;
     }
     // process.exit() ;
   });

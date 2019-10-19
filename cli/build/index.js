@@ -6,4 +6,4 @@ const setupData = require('../setupData');
 module.exports = () => {
   packageFile(setupData);
   process.exit();
-}
+};

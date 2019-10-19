@@ -6,21 +6,21 @@ const moment = require('moment');
 class Thread {
 
   constructor(status) {
-      let timestamp = moment().format('x');
-      this._threadMessage = null;
-      this._threadMessageRx = false;
-      this._threadError = null;
-      this._threadErrorRx = false;
-      this._threadExit = null;
-      this._threadExitRx = false;
-      this._payload = null;
-      this._status = status;
-      this._created_at = timestamp;
-      this._updated_at = timestamp;
+    let timestamp = moment().format('x');
+    this._threadMessage = null;
+    this._threadMessageRx = false;
+    this._threadError = null;
+    this._threadErrorRx = false;
+    this._threadExit = null;
+    this._threadExitRx = false;
+    this._payload = null;
+    this._status = status;
+    this._created_at = timestamp;
+    this._updated_at = timestamp;
 
-      if (status !== 'pool') {
-        this.run();
-      }
+    if (status !== 'pool') {
+      this.run();
+    }
   }
 
   run() {
@@ -92,7 +92,7 @@ class Thread {
   }
 
   setPayload(payload) {
-    this._payload = payload
+    this._payload = payload;
   }
 
   send() {
@@ -178,7 +178,7 @@ const threadCollection = {
       throw e;
     }
   }
-}
+};
 
 const treadLoop = () => {
   for (let key in threadCollection._threads) {
@@ -206,7 +206,7 @@ const treadLoop = () => {
       thread.send();
     }
   }
-}
+};
 
 // Function runs every miliseconds
 setInterval(treadLoop, 0);
@@ -227,7 +227,7 @@ class Threads {
           console.error(e);
           reject(e);
         });
-    })
+    });
   }
 }
 
