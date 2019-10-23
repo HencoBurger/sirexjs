@@ -30,27 +30,37 @@ class Validate {
   isValid(inputs) {
     var fields = this._validFields;
     var isValid = true;
-
     for (var key in fields) {
       var field = fields[key];
-
-      var result = this.checkRules(field, key, inputs);
-
-      if (result.error) {
-        this._errors[key] = result.message;
+      // Check validation on nested json objects
+      if (typeof field.props !== 'undefined') {
+        let propInputs = (typeof inputs[key] !== 'undefined') ? inputs[key] : {};
+        let valodation = new Validate();
+        valodation.setValidFields(field.props);
+        if (valodation.isValid(propInputs)) {
+          this._validData[key] = valodation.fields;
+        } else {
+          this._errors[key] = valodation.errors;
+        }
       } else {
-        if (typeof inputs[key] !== 'undefined') {
-          if (typeof fields[key].key !== 'undefined') {
-            this._validData[fields[key].key] = inputs[key];
-          } else {
-            this._validData[key] = inputs[key];
+        var result = this.checkRules(field, key, inputs);
+
+        if (result.error) {
+          this._errors[key] = result.message;
+        } else {
+          if (typeof inputs[key] !== 'undefined') {
+            if (typeof field.key !== 'undefined') {
+              this._validData[field.key] = inputs[key];
+            } else {
+              this._validData[key] = inputs[key];
+            }
           }
         }
       }
     }
 
 
-    if(  Object.keys(this._errors).length != 0) {
+    if (Object.keys(this._errors).length != 0) {
       isValid = false;
     }
     // if(_.size(this._errors) != 0) {
@@ -64,6 +74,13 @@ class Validate {
 
     var hasError = false;
     var errorMessage = key;
+
+    // First letter of word Uppercase
+    errorMessage = `${errorMessage.charAt(0).toUpperCase()}${errorMessage.slice(1)}`;
+    if (typeof field.field_name !== 'undefined') {
+      errorMessage = field.field_name;
+    }
+
     var validationChecks = {
       'required': 'isRequired',
       'string': 'isString',
@@ -81,7 +98,7 @@ class Validate {
 
         if (result.error) {
           hasError = true;
-          errorMessage = errorMessage +','+ result.message;
+          errorMessage = errorMessage + ',' + result.message;
         }
 
       }
@@ -165,11 +182,11 @@ class Validate {
       var data = moment(inputs[key], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
       var isValid = moment(data).isValid();
 
-      if(data !== inputs[key]) {
+      if (data !== inputs[key]) {
         error = true;
         message = ' is not a valid date';
       } else {
-        if(!isValid) {
+        if (!isValid) {
           error = true;
           message = ' is not a valid date';
         }
@@ -184,4 +201,6 @@ class Validate {
 
 }
 
-module.exports = () => { return new Validate(); };
+module.exports = () => {
+  return new Validate();
+};
