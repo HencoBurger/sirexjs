@@ -39,6 +39,7 @@ Choose from the following options.
 ### Getting Started
 Create a new service called “user” with an attached API end-point and save data to MongoDB.
 
+- [Run Development](#run-development)
 - [Environment file](#environment-file)
 - [Create Service](#create-service)
 - [Service Route](#service-route)
@@ -59,6 +60,12 @@ Inside the project folder run:
 <code>
 sirexjs
 </code>
+
+#### Run development
+Run your application in development mode by running this command.<br/>
+<code>npm run dev</code><br/>
+This sets up a nodemon watcher.  The watcher restart your development server
+as soon as it dedects change in the code.
 
 #### Environment file
 Creating a new application also creates an ".env-template" file. Rename this file to ".env" and add your relevant information.
@@ -291,10 +298,16 @@ const validate = sirexjs.Extensions.validation();
 
 validate.setValidFields({
   'callsign': {
-    'rules': 'required'
+    'rules': 'required',
+    field_name: 'App callsign'
   },
   'email': {
-    'rules': 'required|email'
+    'rules': 'required|email',
+    field_name: 'Local email'
+  },
+  'address': {
+    'props': 'required|email',
+    field_name: 'Local email'
   }
 });
 
