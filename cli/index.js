@@ -8,7 +8,18 @@ const createService = require('./createService');
 const createMiddleware = require('./createMiddleware');
 const createThread = require('./createThread');
 
+function terminate() {
+	term.grabInput( false ) ;
+	setTimeout( function() {
+    term.clear();
+    process.exit();
+  } , 100 ) ;
+}
+
 module.exports = (() => {
+  term.on( 'key' , function( name , matches , data ) {
+  	if ( name === 'CTRL_C' ) { terminate() ; }
+  } ) ;
 
   term(`
     \n\n\n\n

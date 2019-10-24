@@ -12,6 +12,9 @@ SirexJs was inspired by the Microservices architecture. <br/>
 You can think of a SirexJs services as a:<br/>
 Stand-alone feature or grouping of code with its own routing table that connects to one database model.  Services can also talk to one another through a service gateway.
 
+##### Updates
+Read more about [version updates](CHANGELOG.md).
+
 ## CLI
 ### Install
 Install SirexJs globally.
@@ -39,7 +42,8 @@ Choose from the following options.
 ### Getting Started
 Create a new service called “user” with an attached API end-point and save data to MongoDB.
 
-- [Environment file](#environment-file)
+- [Run Development Mode](#run-development-mode)
+- [Environment File](#environment-file)
 - [Create Service](#create-service)
 - [Service Route](#service-route)
 - [Sub Routes](#service-sub-routes)
@@ -54,13 +58,13 @@ Create a new service called “user” with an attached API end-point and save d
   - [API Response](#api-response)
 - [Threads (Child Process)](#threads)
 
-Inside the project folder run:
+#### Run development Mode
+Run your application in development mode by running this command.<br/>
+<code>npm run dev</code><br/>
+This sets up a nodemon watcher.  The watcher restart your development server
+as soon as it dedects change in "/src" folder.
 
-<code>
-sirexjs
-</code>
-
-#### Environment file
+#### Environment File
 Creating a new application also creates an ".env-template" file. Rename this file to ".env" and add your relevant information.
 
 #### Create a Service
@@ -283,18 +287,57 @@ sirexjs.Extensions.logger.error("Error logs here");
 ```
 
 ##### Validation
-Validation uses [validator](https://www.npmjs.com/package/validator) internally. It was modified to be a bit more compact.
+Validation uses [validator](https://www.npmjs.com/package/validator) internally. It was modified to be a bit more "compact".<br/>
+Validation also has the ability to validate nested properties.
 
+###### Flat validation
 ```
 const sirexjs = require('sirexjs');
 const validate = sirexjs.Extensions.validation();
 
 validate.setValidFields({
   'callsign': {
-    'rules': 'required'
+    'rules': 'required',
+    field_name: 'App callsign'
   },
   'email': {
-    'rules': 'required|email'
+    'rules': 'required|email',
+    field_name: 'Local email'
+  },
+  'address': {
+    'props': 'required|email',
+    field_name: 'Local email'
+  }
+});
+
+if (validate.isValid(data)) {
+  sirexjs.Extensions.logger.info(validate.fields);
+} else {
+  throw sirexjs.Extensions.exceptions(404, 'Could not create new user', validate.errors);
+}
+```
+
+###### Nested validation
+```
+const sirexjs = require('sirexjs');
+const validate = sirexjs.Extensions.validation();
+
+validate.setValidFields({
+  'callsign': {
+    'rules': 'required',
+    field_name: 'App callsign'
+  },
+  'address': {
+    'props': {
+      'prop_1': {
+        'rules': 'required',
+        field_name: 'State'
+      },
+      'prop_2': {
+        'rules': 'required|number',
+        field_name: 'Postcode'
+      },
+    }
   }
 });
 
@@ -312,8 +355,9 @@ Types:
 - float
 - boolean
 - date
+- email
 
-You can pipe types. Require a field and type:
+Require a field and type:
 
 ```
   'userName': {
@@ -357,23 +401,97 @@ const serviceGateway = require('services');
 ```
 
 ##### Exceptions
-API response and exceptions work together. Make sure all exceptions caught is eventually passed to the route response for API end-points to display any error messages.
+API response and exceptions functions work together. Make sure all exceptions caught is eventually passed to the route response of the API end-points to display any error messages to the user.  There are 3 kinds of exceptions that can be thrown.
+
+Exception types:
+- Response
+- System
+- Standard
+
+All exceptions except "Response" will trigger a stack trace error log.
+
+###### Response
+Use case: <br/>
+Used when you have validation error to handle.
 
 Example: <br/>
-exception(http_response_code, 'Description', colleciton_of_errors); <br/>
+sirexjs.Extensions.exceptions.response(http_response_code, 'Description', colleciton_of_errors); <br/>
 
-<code> throw exceptions(400, 'Could not create new user', validate.errors); </code>
+```
+const sirexjs = require('sirexjs');
+
+throw sirexjs.Extensions.exceptions.response(400, 'Could not create new user', validate.errors);
+```
+
+Endpoint Response:
+
+```
+{
+    "message": "Following fields are invalid.",
+    "endpoint": "/user/sign-up",
+    "method": "POST",
+    "timestamp": "2019-10-24T14:03:22.780Z",
+    "errors": {
+        "email": "Email is not a valid email format"
+    }
+}
+```
+
+###### System
+Use case: <br/>
+Error relating to the API application.
+
+Example: <br/>
+sirexjs.Extensions.exceptions.system('your_message_here'); <br/>
+
+```
+const sirexjs = require('sirexjs');
+
+throw sirexjs.Extensions.exceptions.system('Internal conflict found.');
+```
+
+Endpoint Response:
+
+```
+{
+    "message": "Internal conflict found.",
+    "endpoint": "/user/sign-up",
+    "method": "POST",
+    "timestamp": "2019-10-24T13:49:22.388Z"
+}
+```
+###### Standard
+Use case:
+Any exceptions thrown by node.
+
+Endpoint Response:
+
+```
+{
+    "message": "We seem to have a problem. Please contact support and reference the included information.",
+    "endpoint": "/user/sign-up",
+    "method": "POST",
+    "timestamp": "2019-10-24T14:05:55.588Z"
+}
+```
 
 ##### API Response
-Display data back to users.
-<br/>Data displayed
+Display data back to users. <br/>
+The response function can handle succeeded and exception responses to the user.
+
 <code>res.restResponse(responseData);</code>
 
 Example:
 ```
-try {
-  res.restResponse(user);
-} catch(e) {
-  res.restResponse(e);
-}
+router.post('/sign-up', async (req, res) => {
+  try {
+    let user = {
+      firstName: 'Name'
+    };
+    res.restResponse(user);
+  } catch(e) {
+    res.restResponse(e);
+  }
+});
+
 ```
