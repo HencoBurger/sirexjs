@@ -87,7 +87,8 @@ class Validate {
       'integer': 'isInteger',
       'float': 'isFloat',
       'boolean': 'isBoolean',
-      'date': 'isDate'
+      'date': 'isDate',
+      'email': 'isEmail'
     };
 
 
@@ -95,12 +96,10 @@ class Validate {
       var method = validationChecks[valKey];
       if (typeof field.rules !== 'undefined' && field.rules.indexOf(valKey) !== -1) {
         let result = this[method](key, inputs);
-
         if (result.error) {
           hasError = true;
-          errorMessage = errorMessage + ',' + result.message;
+          errorMessage = `${errorMessage}${result.message}`;
         }
-
       }
     }
 
@@ -191,6 +190,23 @@ class Validate {
           message = ' is not a valid date';
         }
       }
+    }
+
+    return {
+      'error': error,
+      'message': message
+    };
+  }
+
+  isEmail(key, inputs) {
+    var error = false;
+    var message = '';
+
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if (typeof inputs[key] !== 'undefined' && inputs[key] !== '' && !re.test(String(inputs[key]).toLowerCase())) {
+      error = true;
+      message = ' is not a valid email format';
     }
 
     return {
