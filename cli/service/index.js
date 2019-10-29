@@ -9,6 +9,8 @@ const helpers = require('../helpers');
 
 module.exports = () => {
 
+  serviceData.service_name = serviceData.service_name.replace(/\s/g, '');
+
   let projectFolder = process.cwd();
 
   let serviceFolder = `${projectFolder}/src/services/${serviceData.service_name}`;

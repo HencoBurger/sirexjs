@@ -7,6 +7,7 @@ const initProject = require('./initProject');
 const createService = require('./createService');
 const createMiddleware = require('./createMiddleware');
 const createThread = require('./createThread');
+const createEvent = require('./createEvent');
 
 function terminate() {
 	term.grabInput( false ) ;
@@ -42,7 +43,8 @@ module.exports = (() => {
     `init         Create new project.`,
     `service      Create new service.`,
     `middleware   Create new middleware.`,
-    `thread       Create new Service Child Process.`
+    `thread       Create new Service Child Process.`,
+    `event        Create new websocket event.`
   ];
 
   term.singleColumnMenu(items, async function(error, response) {
@@ -58,6 +60,9 @@ module.exports = (() => {
       break;
     case 3:
       createThread();
+      break;
+    case 4:
+      createEvent();
       break;
     }
     // process.exit() ;

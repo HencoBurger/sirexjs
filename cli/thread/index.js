@@ -37,7 +37,7 @@ module.exports = () => {
     `'use strict';
 
 // ${threadData.thread_name} Thread function
-module.exports = function() {
+module.exports = function ${threadData.thread_name}() {
   // Put some long running code here.
   return 'something';
 }

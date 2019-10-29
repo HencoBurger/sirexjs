@@ -28,7 +28,7 @@ module.exports = async (options) => {
     "express": "4.17.1",
     "express-fileupload": "1.1.5",
     "moment": "2.24.0",
-    "mongoose": "5.6.12",
+    "mongoose": "5.7.5",
     "winston": "3.2.1",
     "sirexjs": "${options.sirex_version}"
   },

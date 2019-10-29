@@ -7,6 +7,8 @@ const middlewareData = require('../middlewareData');
 
 module.exports = () => {
 
+  middlewareData.middleware_name = middlewareData.middleware_name.replace(/\s/g, '');
+
   let projectFolder = process.cwd();
 
   let middlewareFolder = `${projectFolder}/src/middleware/${middlewareData.middleware_name}`;
@@ -23,7 +25,7 @@ module.exports = () => {
     `'use strict';
 
 // ${middlewareData.middleware_name} Middleware
-module.exports = function(req, res, done) {
+module.exports = function ${middlewareData.middleware_name}(req, res, done) {
 
   done();
 }
