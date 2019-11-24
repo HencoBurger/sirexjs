@@ -1,7 +1,6 @@
 # SirexJs
 Service layer architecture for Express. Sir-(vice) Ex-(press)
-</br>
-</br>
+
 SirexJs is not a new "framework", but more of a way of using Express to build API's.</br>
 Like the Express website says "Express is a fast, unopinionated, minimalist web framework for Node.js.</br>
 SirexJs is an opinion on how build API's with Express.
@@ -228,12 +227,24 @@ const schema = require('./schema');
 
 module.exports = class UserModel extends sirexjs.Database.mongodb {
 
+  // Collection name goes here
   get collectionName() {
     return 'user';
   }
 
+  // Schema options goes here
   get collectionSchema() {
     return schema;
+  }
+
+  // Collection indexes goes here
+  get collectionIndexes() {
+    return [{
+      userName: 1
+    },
+    {
+      email: 1
+    }];
   }
 
   async createUser(userData) {

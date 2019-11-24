@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2019-10-24
+### Added
+- Database Indexes: Added indexes to model.
+### Changed
+### Removed
+
 ## [0.6.0] - 2019-10-24
 ### Added
 - Validation: Validate nested properties.
