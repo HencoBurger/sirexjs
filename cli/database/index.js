@@ -56,6 +56,19 @@ const sirexjs = require('sirexjs');
 
 class ${helpers.capitalized(databaseData.database_name)}Database {
   
+  /**
+   * This function will be called before node spins up.
+   * Node will start when there is a successful connection with your database.
+   *  
+   * @static
+   * @returns Promise
+   */
+  static connect() {
+    return new Promise(function (resolve, reject) {
+      // Database connection code goes here.
+      // Make sure that a successful connection fires "resolve(true)" and a unsuccessful connection a "reject(true)"
+    });
+  }
 }
 
 module.exports = (() => { return new ${helpers.capitalized(databaseData.database_name)}Database(); })();

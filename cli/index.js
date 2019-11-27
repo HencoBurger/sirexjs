@@ -10,8 +10,8 @@ const createMiddleware = require('./createMiddleware');
 const createThread = require('./createThread');
 
 function terminate() {
-	term.grabInput( false ) ;
-	setTimeout( function() {
+  term.grabInput( false ) ;
+  setTimeout( function() {
     term.clear();
     process.exit();
   } , 100 ) ;

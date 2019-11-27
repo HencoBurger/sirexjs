@@ -29,9 +29,13 @@ let loaded = (function () {
 module.exports = class Databases {
 
   constructor() {
-    for (let key in loaded) {
-      let toLoad = loaded[key]
-      this[key] = new toLoad();
+    try {
+      for (let key in loaded) {
+        let toLoad = loaded[key];
+        this[key] = new toLoad();
+      }
+    } catch(e) {
+      throw e;
     }
   }
 
