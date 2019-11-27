@@ -11,8 +11,6 @@ module.exports = class Databases {
   constructor() {
     try {
       const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
-      console.log(sirexjs);
-      console.log(2);
       // Always make sure that the collection schema has created and updates at items set
       this.collectionSchema.createdAt = Date;
       this.collectionSchema.updatedAt = Date;

@@ -41,35 +41,22 @@ module.exports = (() => { return new ${helpers.capitalized(serviceData.service_n
   fs.writeFileSync(`${serviceFolder}/routes/index.js`, routeIndex);
 
   fs.mkdirSync(`${serviceFolder}/model`);
-  fs.writeFileSync(`${serviceFolder}/model/schema.js`,
-    `'use strict';
-
-module.exports = {};
-`);
+ 
   fs.writeFileSync(`${serviceFolder}/model/index.js`,
     `'use strict';
 
 const sirexjs = require('sirexjs');
-const schema = require('./schema');
 
-module.exports = class ${helpers.capitalized(serviceData.service_name)}Model extends sirexjs.Database.mongodb {
+// You can extend any database class or setup you want
+
+module.exports = class ${helpers.capitalized(serviceData.service_name)}Model {
 
   get collectionName() {
     return '${serviceData.service_name}';
   }
-
-  get collectionSchema() {
-    return schema;
-  }
 }
 `);
-  fs.mkdirSync(`${serviceFolder}/model/aggregations`);
-  fs.writeFileSync(`${serviceFolder}/model/aggregations/index.js`,
-    `'use strict';
-
-module.exports = {};
-`);
-
+ 
   fs.mkdirSync(`${serviceFolder}/managers`);
   fs.writeFileSync(`${serviceFolder}/managers/README.md`,'# Business logic goes here.');
 
