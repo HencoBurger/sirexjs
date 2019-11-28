@@ -30,14 +30,16 @@ sirexjs
 
 Choose from the following options.
 
-- **init - Create new project.<br/>**
-  Navigate to your project folder or ask SirexJs to create a new project folder structure for you.
-- **service - Create new service.<br/>**
-  Use this option to create the folder structure and initial code to start developing your new service.
-- **middleware - Create new middleware.<br/>**
-  Creates a middleware template function in "src/middleware".
-- **thread - Create new Service Child Process.<br/>**
-  Creates a thread template function for a Service "src/services/[service_name]/threads/[thread_name]".
+- **init - Create new project.**
+  Navigate to your project folder or ask SirexJs to create a new project folder structure for you.<br/>
+- **service - Create new service.**
+  Use this option to create the folder structure and initial code to start developing your new service.<br/>
+- **database - Create a connection to your preferred database.**
+  Create a database initialization template.<br/>
+- **middleware - Create new middleware.**
+  Creates a middleware template function in "src/middleware".<br/>
+- **thread - Create new Service Child Process.**
+  Creates a thread template function for a Service "src/services/[service_name]/threads/[thread_name]".<br/>
 
 ### Getting Started
 Create a new service called “user” with an attached API end-point and save data to MongoDB.
@@ -48,6 +50,7 @@ Create a new service called “user” with an attached API end-point and save d
 - [Service Route](#service-route)
 - [Sub Routes](#service-sub-routes)
 - [Managers](#managers)
+- [Databases](#databases)
 - [Models](#models)
 - [Access Mongoose Types](#access-mongoose-types)
 - [Extensions](#extensions)
@@ -66,6 +69,13 @@ as soon as it dedects change in "/src" folder.
 
 #### Environment File
 Creating a new application also creates an ".env-template" file. Rename this file to ".env" and add your relevant information.
+
+#### Databases
+After creating a new datanase connection a folder will be created with the name of your new database connection.
+
+In the class template there is a function called "connect()" this function is called before the nodejs instance is created.  Node will not start untill the promise is "resolved" or "rejected".
+
+You an connect any database, MongoDB, MySQL, NeDB, CouchDB or you can connect all of them.  All up to you.
 
 #### Create a Service
 
@@ -209,66 +219,9 @@ module.exports = class SignUp {
 ```
 
 #### Models
-At the moment MongoDB is the default database for SirexJs.<br/>
-When you create a service a model folder structure is created by default.
+When you create a service a model folder structure is created by default.  You can extend the model class with the database connection you created before.
 
-Access model collection:<br/>
-<code> let user = await serviceGateway.user.model.collection.find({}); </code>
-
-Or extend the model with your own methods:<br/>
-<code> let user = await serviceGateway.user.model.createUser(saveData); </code>
-
-Example - extend models
-
-```
-'use strict';
-
-const sirexjs = require('sirexjs');
-const schema = require('./schema');
-
-module.exports = class UserModel extends sirexjs.Database.mongodb {
-
-  get collectionName() {
-    return 'user';
-  }
-
-  get collectionSchema() {
-    return schema;
-  }
-
-  async createUser(userData) {
-    try {
-      let user = await this.collection.create(userData);
-      user = await this.collection.find({ _id: this.types.ObjectId(user._id) });
-      return ussirexjs.Extensions.er;
-    } catch (e) {
-      sirexjs.Extensions.logger.error("[UserModel][createUser]", e);
-      throw e;
-    }
-  }
-}
-```
-
-#### Access Mongoose Types
-Example - Inside data model file
-
-```
-  async updateUser(id, userData) {
-    await this.collection.updateOne({ id: this.types.ObjectId(id) }, userData);
-  }
-```
-
-Example - Outside data model file
-
-```
-const serviceGateway = require('services');
-const sirexjs = require('sirexjs');
-
-module.exports = (id) => {
-  let types = sirexjs.Database.mongodb.types;
-  await serviceGateway.user.model.collection.updateOne({ _id: types.ObjectId(id) }, { callsign: 'Boo' });
-}
-```
+With that said, its all up to you how you structure your models.
 
 #### Extensions
 These methods are there to make your development process easier.

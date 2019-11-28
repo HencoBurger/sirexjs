@@ -3,7 +3,6 @@
 const fs = require('fs');
 const threads = require('../extensions/threads');
 const logger = require('../extensions/logger');
-const Database = require('../databases');
 
 module.exports = class Services {
 
@@ -49,8 +48,6 @@ module.exports = class Services {
 
   static load() {
     try {
-      // TODO check between mongodb and mysql
-      Database.mongodb.connect();
       // Get all services
       const folderPath = process.cwd();
 
@@ -67,7 +64,16 @@ module.exports = class Services {
       let servicesFolders = {};
       for(let key in foundServices) {
         let value = foundServices[key];
-        servicesFolders[value] = require(`${folderPath}/src/services/${value}`);
+
+        const myClass = {
+          [value]: class extends Services {
+            get serviceName() {
+              return value;
+            }
+          }
+        } [value];
+
+        servicesFolders[value] = new myClass();
       }
 
       return servicesFolders;

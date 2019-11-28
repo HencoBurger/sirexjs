@@ -5,12 +5,13 @@
 const term = require('terminal-kit').terminal;
 const initProject = require('./initProject');
 const createService = require('./createService');
+const createDatabase = require('./createDatabase');
 const createMiddleware = require('./createMiddleware');
 const createThread = require('./createThread');
 
 function terminate() {
-	term.grabInput( false ) ;
-	setTimeout( function() {
+  term.grabInput( false ) ;
+  setTimeout( function() {
     term.clear();
     process.exit();
   } , 100 ) ;
@@ -41,6 +42,7 @@ module.exports = (() => {
   var items = [
     `init         Create new project.`,
     `service      Create new service.`,
+    `database     Create a connection to your preferred database.`,
     `middleware   Create new middleware.`,
     `thread       Create new Service Child Process.`
   ];
@@ -54,12 +56,14 @@ module.exports = (() => {
       createService();
       break;
     case 2:
-      createMiddleware();
+      createDatabase();
       break;
     case 3:
+      createMiddleware();
+      break;
+    case 4:
       createThread();
       break;
     }
-    // process.exit() ;
   });
 })();

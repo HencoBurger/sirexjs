@@ -1,7 +1,8 @@
 'use strict';
 
-module.exports.load = (hooks = {}) => {
+const Databases = require('../databases');
 
+module.exports.load = (hooks = {}) => {
   if (typeof hooks.beforeLoad !== 'undefined' && typeof hooks.beforeLoad === 'function') {
     this.beforeLoad = hooks.beforeLoad();
   }
@@ -47,12 +48,12 @@ module.exports.load = (hooks = {}) => {
   if (typeof hooks.beforeCreate !== 'undefined' && typeof hooks.beforeCreate === 'function') {
     hooks.beforeCreate(app);
   }
-
+  
+  Databases.connect();
   // Check to see if the databases are ready to be used by application
   let dbConnect = setInterval(() => {
 
-    let dbStatus = process.db_status;
-    if(dbStatus.mongodb !== null && dbStatus.mysql !== null) {
+    if (process.db_status) {
       // Spin up application after db connected
       app.listen(process.env.APP_PORT, function() {
         sirexjs.Extensions.logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);

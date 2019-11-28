@@ -121,7 +121,27 @@ module.exports = (() => {
  return sirexjs.Middleware.load();
 })();
 `);
-    fs.writeFileSync(`${projectFolder}/src/middleware/README.md`, '');
+    fs.writeFileSync(`${projectFolder}/src/databases/README.md`, '');
+
+    fs.mkdirSync(`${projectFolder}/src/databases`);
+    fs.writeFileSync(`${projectFolder}/src/databases/index.js`,
+      `/*
+
+  DO NOT DELETE OR MODIFY THIS FILE
+
+  This file loads up saved Database connections.
+
+*/
+
+'use strict';
+
+const sirexjs = require('sirexjs');
+
+module.exports = (() => {
+ return sirexjs.Database.load();
+})();
+`);
+    fs.writeFileSync(`${projectFolder}/src/databases/README.md`, '');
 
     fs.mkdirSync(`${projectFolder}/src/router`);
     let routeIndex = fs.readFileSync(path.resolve(__dirname, "../service/temp/routeIndex.js"));
