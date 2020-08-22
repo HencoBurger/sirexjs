@@ -10,23 +10,27 @@ module.exports = class Middleware {
       // Get all middleware
       const folderPath = process.cwd();
 
-      let folders = fs.readdirSync(`${folderPath}/src/middleware`);
+      let Files = fs.readdirSync(`${folderPath}/src/middleware`);
+      
       let foundServices = [];
 
-      for(let folder of folders) {
-        if(fs.lstatSync(`${folderPath}/src/middleware/${folder}`).isDirectory()) {
-          foundServices.push(folder);
+      var getJsFiles = new RegExp('\.js+$','i');
+
+      for(let file of Files) {
+        if (
+          fs.statSync(`${folderPath}/src/middleware/${file}`).isFile() &&
+          file.match(getJsFiles)
+        ) {
+          foundServices.push(file.split(".")[0]);
         }
       }
 
       // return foundServices;
-      let middlewareFolders = {};
       for(let key in foundServices) {
         let value = foundServices[key];
-        middlewareFolders[value] = require(`${folderPath}/src/middleware/${value}`);
+        this[value] = require(`${folderPath}/src/middleware/${value}`);
       }
-
-      return middlewareFolders;
+      logger.info('Middleware loaded.');
     } catch(e) {
       logger.error(`[sirexjs][middleware][loadMiddleware]`, e);
       throw e;

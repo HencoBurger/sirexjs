@@ -1,7 +1,5 @@
 'use strict';
 
-const Databases = require('../databases');
-
 module.exports.load = (hooks = {}) => {
   if (typeof hooks.beforeLoad !== 'undefined' && typeof hooks.beforeLoad === 'function') {
     this.beforeLoad = hooks.beforeLoad();
@@ -16,6 +14,10 @@ module.exports.load = (hooks = {}) => {
   require(`${process.cwd()}/node_modules/app-module-path`).addPath(`${process.cwd()}/src`);
 
   const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
+
+  // Load services
+  sirexjs.Services.load();
+  sirexjs.Middleware.load();
 
   // const router = require('core/router');
   const express = require(`${process.cwd()}/node_modules/express`);
@@ -48,22 +50,14 @@ module.exports.load = (hooks = {}) => {
   if (typeof hooks.beforeCreate !== 'undefined' && typeof hooks.beforeCreate === 'function') {
     hooks.beforeCreate(app);
   }
-  
-  Databases.connect();
-  // Check to see if the databases are ready to be used by application
-  let dbConnect = setInterval(() => {
 
-    if (process.db_status) {
-      // Spin up application after db connected
-      app.listen(process.env.APP_PORT, function() {
-        sirexjs.Extensions.logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
-        sirexjs.Extensions.logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
-        if (typeof hooks.created !== 'undefined' && typeof hooks.created === 'function') {
-          hooks.created(app);
-        }
-      });
-
-      clearInterval(dbConnect);
+  // Spin up application after db connected
+  app.listen(process.env.APP_PORT, function() {
+    sirexjs.Extensions.logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
+    sirexjs.Extensions.logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
+    if (typeof hooks.created !== 'undefined' && typeof hooks.created === 'function') {
+      hooks.created(app);
     }
-  },1);
+  });
+
 };
