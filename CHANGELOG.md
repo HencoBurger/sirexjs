@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2020-08-22
+### Added
+### Changed
+- Changed the reliance on "index.js" files in root folders, and more to preloading set features
+### Removed
+- CLI: Removed the "CLI" feature and moved it to a separate branch.
+
 ## [0.7.0] - 2019-10-24
 ### Added
 - Database: Ability to add any database structure you want.

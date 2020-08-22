@@ -34,7 +34,7 @@ module.exports.load = (hooks = {}) => {
   app.use(bodyParser.json()); // support json encoded bodies
 
   app.use(fileUpload()); // Upload files
-
+  
   // Custom response for all reoutes
   app.use(sirexjs.Extensions.restResponse);
 

@@ -1,8 +1,8 @@
 # SirexJs
 Service layer architecture for Express. Sir-(vice) Ex-(press)
-</br>
-</br>
-SirexJs is not a new "framework", but more of a way of using Express to build API's.</br>
+
+SirexJs is not a new "framework", but more of a way of using Express to build API's.
+
 Like the Express website says "Express is a fast, unopinionated, minimalist web framework for Node.js.</br>
 SirexJs is an opinion on how build API's with Express.
 
@@ -63,7 +63,10 @@ Create a new service called “user” with an attached API end-point and save d
 
 #### Run development Mode
 Run your application in development mode by running this command.<br/>
-<code>npm run dev</code><br/>
+```javascript
+npm run dev
+```
+
 This sets up a nodemon watcher.  The watcher restart your development server
 as soon as it dedects change in "/src" folder.
 
@@ -88,11 +91,13 @@ Follow the next steps to attach the service to a API end-point and save data to 
 #### Service Route
 Adding the following route gives you access to the service sub routes.
 
-<code>router.use('/user', serviceGateway.user.routes);</code>
+```javascript
+router.use('/user', serviceGateway.user.routes);
+```
 
 Example:<br/>
 project/src/router/index.js
-```
+```javascript
 'use strict';
 
 const express = require('express');
@@ -115,7 +120,7 @@ module.exports = (function () {
 #### service sub routes
 Add sub-routes to a service
 
-```
+```javascript
 const sirexjs = require('sirexjs');
 
 router.post('/sign-up', async (req, res) => {
@@ -133,9 +138,7 @@ router.post('/sign-up', async (req, res) => {
 Example:<br/>
 /project/src/services/user/routes
 
-```
-'use strict';
-
+```javascript
 const express = require('express');
 const router = express.Router();
 const sirexjs = require('sirexjs');
@@ -171,10 +174,12 @@ module.exports = (function () {
 Service manager contains logic to manipulate data before you save it to a database or use the manipulated data in other parts of your application.
 
 You can access the manager through the "serviceGateway".<br/>
-<code>serviceGateway.serviceName.manager('managerFileLocation/managerFileName');</code>
+```javascript
+serviceGateway.serviceName.manager('managerFileLocation/managerFileName');
+```
 
 Example:
-```
+```javascript
 const serviceGateway = require('services');
 
 module.exports = (data) => {
@@ -185,9 +190,7 @@ module.exports = (data) => {
 
 Example - User Manager
 
-```
-'user strict';
-
+```javascript
 const serviceGateway = require('services');
 const sirexjs = require('sirexjs');
 
@@ -230,9 +233,8 @@ These methods are there to make your development process easier.
 Logger is and extension of Winston. For more about how to use logger go [here](https://www.npmjs.com/package/winston).
 
 Examples: <br/>
-const sirexjs = require('sirexjs');
 
-```
+```javascript
 const sirexjs = require('sirexjs');
 
 sirexjs.Extensions.logger.info("Info logs here");
@@ -244,7 +246,7 @@ Validation uses [validator](https://www.npmjs.com/package/validator) internally.
 Validation also has the ability to validate nested properties.
 
 ###### Flat validation
-```
+```javascript
 const sirexjs = require('sirexjs');
 const validate = sirexjs.Extensions.validation();
 
@@ -271,7 +273,7 @@ if (validate.isValid(data)) {
 ```
 
 ###### Nested validation
-```
+```javascript
 const sirexjs = require('sirexjs');
 const validate = sirexjs.Extensions.validation();
 
@@ -312,13 +314,15 @@ Types:
 
 Require a field and type:
 
-```
+```javascript
+{
   'userName': {
     'rules': 'string'
   },
   'email': {
     'rules': 'required|email'
   }
+}
 ```
 ##### Threads
 Node is single threaded and because of this any long running processes will block the event loop.  This creates latency in your application.  Using threads you can offload any long running process to a separate Child Process.
@@ -332,7 +336,7 @@ Features:
 
 
 ###### Using it as a extension:
-```
+```javascript
   const sirexjs = require('sirexjs');
 
   let thread = await sirexjs.Extensions.threads('location_of_function', ['arg1','arg2','arg3'])
@@ -342,7 +346,7 @@ Features:
   .received();
 ```
 ###### Using it through service gateway:
-```
+```javascript
 const serviceGateway = require('services');
 
   let thread = await serviceGateway.user.thread('thread_in_service_threads_folder',  ['arg1','arg2','arg3'])
@@ -370,7 +374,7 @@ Used when you have validation error to handle.
 Example: <br/>
 sirexjs.Extensions.exceptions.response(http_response_code, 'Description', colleciton_of_errors); <br/>
 
-```
+```javascript
 const sirexjs = require('sirexjs');
 
 throw sirexjs.Extensions.exceptions.response(400, 'Could not create new user', validate.errors);
@@ -378,7 +382,7 @@ throw sirexjs.Extensions.exceptions.response(400, 'Could not create new user', v
 
 Endpoint Response:
 
-```
+```json
 {
     "message": "Following fields are invalid.",
     "endpoint": "/user/sign-up",
@@ -397,7 +401,7 @@ Error relating to the API application.
 Example: <br/>
 sirexjs.Extensions.exceptions.system('your_message_here'); <br/>
 
-```
+```javascript
 const sirexjs = require('sirexjs');
 
 throw sirexjs.Extensions.exceptions.system('Internal conflict found.');
@@ -405,7 +409,7 @@ throw sirexjs.Extensions.exceptions.system('Internal conflict found.');
 
 Endpoint Response:
 
-```
+```json
 {
     "message": "Internal conflict found.",
     "endpoint": "/user/sign-up",
@@ -419,7 +423,7 @@ Any exceptions thrown by node.
 
 Endpoint Response:
 
-```
+```json
 {
     "message": "We seem to have a problem. Please contact support and reference the included information.",
     "endpoint": "/user/sign-up",
@@ -435,7 +439,7 @@ The response function can handle succeeded and exception responses to the user.
 <code>res.restResponse(responseData);</code>
 
 Example:
-```
+```javascript
 router.post('/sign-up', async (req, res) => {
   try {
     let user = {
