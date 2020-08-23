@@ -14,10 +14,10 @@ module.exports.load = (hooks = {}) => {
   require(`${process.cwd()}/node_modules/app-module-path`).addPath(`${process.cwd()}/src`);
 
   const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
-
-  // Load services
-  sirexjs.Services.load();
+  
+  sirexjs.Databases.load();
   sirexjs.Middleware.load();
+  sirexjs.Services.load();
 
   // const router = require('core/router');
   const express = require(`${process.cwd()}/node_modules/express`);

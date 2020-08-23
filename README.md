@@ -9,24 +9,24 @@ SirexJs is an opinion on how build API's with Express.
 #### Inspiration
 
 SirexJs was inspired by the Microservices architecture. <br/>
-You can think of a SirexJs services as a:<br/>
-Stand-alone feature or grouping of code with its own routing table that connects to one database model.  Services can also talk to one another through a service gateway.
+You can think of a SirexJs <b><u>services</u></b> as a:<br/>
+Stand-alone features or grouping of code with its own routing table that connects to one database model.  SirexJS will also keep track of a Services routing, managers and model connection. So one service can easily communicate with another service.
 
 ##### Updates
 Read more about [version updates](CHANGELOG.md).
 
 ## CLI
 ### Install
-Install SirexJs globally.
+Install SirexJs-CLI globally. This will help you setup you new API.  The SirexJS boilerplace comes with a very little example "Task Service" witch you can plug into a classic "<em>To-Do</em>" app.
 
-<code>
-npm i -g sirexjs
-</code>
+```
+npm i -g sirexjs-cli
+```
 
-##### RUN </br>
-<code>
-sirexjs
-</code>
+Run "sirex-cli" in you project folder or where ever you want to start your new project. </br>
+```
+:Code/myProject$ sirexjs-cli
+```
 
 Choose from the following options.
 
@@ -35,9 +35,9 @@ Choose from the following options.
 - **service - Create new service.**
   Use this option to create the folder structure and initial code to start developing your new service.<br/>
 - **database - Create a connection to your preferred database.**
-  Create a database initialization template.<br/>
+  Create a database initialization template.<br/> This is not needed to run SirexJs but it helps to know what to connect to.
 - **middleware - Create new middleware.**
-  Creates a middleware template function in "src/middleware".<br/>
+  Creates a middleware template function in "src/middleware".<br/> ExpressJs middleware function, just easier that copy/past.
 - **thread - Create new Service Child Process.**
   Creates a thread template function for a Service "src/services/[service_name]/threads/[thread_name]".<br/>
 
@@ -71,12 +71,12 @@ This sets up a nodemon watcher.  The watcher restart your development server
 as soon as it dedects change in "/src" folder.
 
 #### Environment File
-Creating a new application also creates an ".env-template" file. Rename this file to ".env" and add your relevant information.
+Creating a new application also creates an ".env" file. Its already setup as a development environment.
 
 #### Databases
-After creating a new datanase connection a folder will be created with the name of your new database connection.
+After creating a new datanase a folder is created with the name of your new database connection.
 
-In the class template there is a function called "connect()" this function is called before the nodejs instance is created.  Node will not start untill the promise is "resolved" or "rejected".
+This new file exports a class, this class has default property "preload".  This property can be set to <b>TRUE</b> or <b>FALSE</b> depending on if you want to wait for the DB to connect before spinning up your application.
 
 You an connect any database, MongoDB, MySQL, NeDB, CouchDB or you can connect all of them.  All up to you.
 
