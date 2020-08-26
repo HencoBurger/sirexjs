@@ -17,7 +17,7 @@ Read more about [version updates](CHANGELOG.md).
 
 ## CLI
 ### Install
-Install SirexJs-CLI globally. This will help you setup you new API.  The SirexJS boilerplace comes with a very little example "Task Service" witch you can plug into a classic "<em>To-Do</em>" app.
+Install SirexJs-CLI globally. This will help you set up you API boilerplate.  The SirexJS boilerplace comes with example "Task Service" witch you can plug into a classic "<em>To-Do</em>" app.
 
 ```
 npm i -g sirexjs-cli
@@ -25,8 +25,9 @@ npm i -g sirexjs-cli
 
 Run "sirex-cli" in you project folder or where ever you want to start your new project. </br>
 ```
-:Code/myProject$ sirexjs-cli
+sirexjs-cli
 ```
+### Getting Started
 
 Choose from the following options.
 
@@ -41,7 +42,7 @@ Choose from the following options.
 - **thread - Create new Service Child Process.**
   Creates a thread template function for a Service "src/services/[service_name]/threads/[thread_name]".<br/>
 
-### Getting Started
+
 Create a new service called “user” with an attached API end-point and save data to MongoDB.
 
 - [Run Development Mode](#run-development-mode)
