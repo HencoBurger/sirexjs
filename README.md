@@ -38,7 +38,7 @@ Choose from the following options.
 - **database - Create a connection to your preferred database.**
   Create a database initialization template.<br/> This is not needed to run SirexJs but it helps to know what to connect to.
 - **middleware - Create new middleware.**
-  Creates a middleware template function in "src/middleware".<br/> ExpressJs middleware function, just easier that copy/past.
+  Creates a middleware template function in "src/middleware".<br/> ExpressJs middleware function.
 - **thread - Create new Service Child Process.**
   Creates a thread template function for a Service "src/services/[service_name]/threads/[thread_name]".<br/>
 
@@ -75,25 +75,27 @@ as soon as it dedects change in "/src" folder.
 Creating a new application also creates an ".env" file. Its already setup as a development environment.
 
 #### Databases
-After creating a new datanase a folder is created with the name of your new database connection.
+Creating a new database connection also creates a new folder which contains an example index.js file.
 
-This new file exports a class, this class has default property "preload".  This property can be set to <b>TRUE</b> or <b>FALSE</b> depending on if you want to wait for the DB to connect before spinning up your application.
+This new file exports a class, you can extend this class or create your own implementation.
 
-You an connect any database, MongoDB, MySQL, NeDB, CouchDB or you can connect all of them.  All up to you.
+If you want to only start the application when database is loaded, use the event hooks in Root index.js file.
+
+You can connect any database, MongoDB, MySQL, NeDB, CouchDB or you can connect all of them.  It is all up to you.
 
 #### Create a Service
 
-Choose the options “service - Create new service” follow prompts and create "user" service.<br/>
-After creation is completed you can pretty much use the service for what ever you want.<br/>
-It can be used as a service that is attached to a API end-point or you can use for a stand-alone collection of code that can be used inside you API application.
+From the Sirex-CLI Choose the options “service - Create new service” follow prompts and create your new service.
 
-Follow the next steps to attach the service to a API end-point and save data to MongoDB.
+The service can be used as a service that is attached to a API end-point or you can use it as a stand-alone collection of code that can be used inside other services.
+
+Follow the next steps to attach the service to a API end-point.
 
 #### Service Route
 Adding the following route gives you access to the service sub routes.
 
 ```javascript
-router.use('/user', serviceGateway.user.routes);
+router.use('/tasks', serviceGateway.user.routes);
 ```
 
 Example:<br/>
@@ -104,12 +106,14 @@ project/src/router/index.js
 const express = require('express');
 const router = express.Router();
 
-const middleware = require('middleware');
-const serviceGateway = require('services');
+const {
+  Services,
+  middleware
+} = require('sirexjs');
 
 module.exports = (function () {
 
-  router.use('/user', serviceGateway.user.routes);
+  router.use('/tasks', Services.tasks.routes);
 
   router.use('*', (req, res) =>{
     res.status(200).send(`Resource not be found.`);
@@ -122,48 +126,93 @@ module.exports = (function () {
 Add sub-routes to a service
 
 ```javascript
-const sirexjs = require('sirexjs');
+router.get('/', [Middleware.auth], async (req, res) => {
+  try {
+    console.log(Services.tasks.manager);
+    const list = await Services.tasks.manager('index')
+      .init()
+      .list();
 
-router.post('/sign-up', async (req, res) => {
-    try {
-      const signUp = serviceGateway.user.manager('SignUp');
-      const user = await signUp.create(req.body);
-      res.restResponse(ussirexjs.Extensions.er);
-    } catch(e) {
-      sirexjs.Extensions.sirexjs.Extensions.logger.error(`[services][user][routes][sign-up]`);
-      sirexjs.Extensions.logger.error(e);
-      res.restResponse(e);
-    }
-  })
+    res.restResponse(list);
+  } catch (e) {
+    Extensions.logger.error(e);
+    res.restResponse(e);
+  }
+});
 ```
 Example:<br/>
 /project/src/services/user/routes
 
 ```javascript
+'use strict';
+
 const express = require('express');
 const router = express.Router();
-const sirexjs = require('sirexjs');
 
 // User authentication
-const middleware = require('middleware');
-const serviceGateway = require('services');
+const {
+  Services,
+  Middleware,
+  Extensions
+} = require('sirexjs');
 
 module.exports = (function () {
 
-  router.post('/sign-up', async (req, res) => {
+  router.get('/', [Middleware.auth], async (req, res) => {
     try {
-      const signUp = serviceGateway.user.manager('SignUp');
-      const user = await signUp.create(req.body);
-      res.restResponse(ussirexjs.Extensions.er);
-    } catch(e) {
-      sirexjs.Extensions.sirexjs.Extensions.logger.error(`[services][user][routes][sign-up]`);
-      sirexjs.Extensions.logger.error(e);
+      console.log(Services.tasks.manager);
+      const list = await Services.tasks.manager('index')
+        .init()
+        .list();
+
+      res.restResponse(list);
+    } catch (e) {
+      Extensions.logger.error(e);
       res.restResponse(e);
     }
-  })
+  });
 
-  router.use('*', (req, res) =>{
-    res.status(200).send(`Resource not be found.`);
+  router.post('/', [Middleware.auth], async (req, res) => {
+    try {
+      const created = await Services.tasks.manager('index')
+        .init()
+        .create(req.body);
+
+      res.restResponse(created);
+    } catch (e) {
+      Extensions.logger.error(e);
+      res.restResponse(e);
+    }
+  });
+
+  router.put('/:taskId', [Middleware.auth], async (req, res) => {
+    try {
+      const updated = await Services.tasks.manager('index')
+        .init()
+        .update(req.params.taskId, req.body);
+
+      res.restResponse(updated);
+    } catch (e) {
+      Extensions.logger.error(e);
+      res.restResponse(e);
+    }
+  });
+
+  router.delete('/:taskId', [Middleware.auth], async (req, res) => {
+    try {
+      const deleted = await Services.tasks.manager('index')
+        .init()
+        .delete(req.params.taskId);
+
+      res.restResponse(deleted);
+    } catch (e) {
+      Extensions.logger.error(e);
+      res.restResponse(e);
+    }
+  });
+
+  router.use('*', (req, res) => {
+    res.status(404).send(`Resource not be found.`);
   });
 
   return router;
@@ -172,28 +221,31 @@ module.exports = (function () {
 
 #### Managers
 
-Service manager contains logic to manipulate data before you save it to a database or use the manipulated data in other parts of your application.
+Service managers contains logic to manipulate data before you save it to a database or use the manipulated data in other parts of your application.
 
-You can access the manager through the "serviceGateway".<br/>
-```javascript
-serviceGateway.serviceName.manager('managerFileLocation/managerFileName');
-```
+You can access the manager through "Services".
 
 Example:
 ```javascript
-const serviceGateway = require('services');
+const {
+  Services,
+  Middleware,
+  Extensions
+} = require('sirexjs');
 
-module.exports = (data) => {
-  const signUp = serviceGateway.user.manager('SignUp');
-  const user = await signUp.create(data);
-};
+const list = await Services.tasks.manager('index')
+        .init()
+        .list();
 ```
 
-Example - User Manager
+Example - Task Manager
 
 ```javascript
-const serviceGateway = require('services');
-const sirexjs = require('sirexjs');
+const {
+  Services,
+  Middleware,
+  Extensions
+} = require('sirexjs');
 
 module.exports = class SignUp {
   static async create(body) {
@@ -210,7 +262,7 @@ module.exports = class SignUp {
       });
 
       if (validate.isValid(body)) {
-        return await serviceGateway.user.model.createUser(validate.fields);
+        return await user.model.createTask(validate.fields);
       } else {
         throw sirexjs.Extensions.exceptions(404, 'Could not create new user', validate.errors);
       }
@@ -236,10 +288,14 @@ Logger is and extension of Winston. For more about how to use logger go [here](h
 Examples: <br/>
 
 ```javascript
-const sirexjs = require('sirexjs');
+const {
+  Services,
+  Middleware,
+  Extensions
+} = require('sirexjs');
 
-sirexjs.Extensions.logger.info("Info logs here");
-sirexjs.Extensions.logger.error("Error logs here");
+Extensions.logger.info("Info logs here");
+Extensions.logger.error("Error logs here");
 ```
 
 ##### Validation
@@ -248,8 +304,13 @@ Validation also has the ability to validate nested properties.
 
 ###### Flat validation
 ```javascript
-const sirexjs = require('sirexjs');
-const validate = sirexjs.Extensions.validation();
+const {
+  Services,
+  Middleware,
+  Extensions
+} = require('sirexjs');
+
+const validate = Extensions.validation();
 
 validate.setValidFields({
   'callsign': {
@@ -267,16 +328,21 @@ validate.setValidFields({
 });
 
 if (validate.isValid(data)) {
-  sirexjs.Extensions.logger.info(validate.fields);
+  Extensions.logger.info(validate.fields);
 } else {
-  throw sirexjs.Extensions.exceptions(404, 'Could not create new user', validate.errors);
+  throw Extensions.exceptions(404, 'Could not create new user', validate.errors);
 }
 ```
 
 ###### Nested validation
 ```javascript
-const sirexjs = require('sirexjs');
-const validate = sirexjs.Extensions.validation();
+const {
+  Services,
+  Middleware,
+  Extensions
+} = require('sirexjs');
+
+const validate = Extensions.validation();
 
 validate.setValidFields({
   'callsign': {
@@ -298,9 +364,9 @@ validate.setValidFields({
 });
 
 if (validate.isValid(data)) {
-  sirexjs.Extensions.logger.info(validate.fields);
+  Extensions.logger.info(validate.fields);
 } else {
-  throw sirexjs.Extensions.exceptions(404, 'Could not create new user', validate.errors);
+  throw Extensions.exceptions(404, 'Could not create new user', validate.errors);
 }
 ```
 
@@ -331,30 +397,23 @@ Node is single threaded and because of this any long running processes will bloc
 Features:
 - New threads only spin up when requested.
 - Previously created threads are re-used as spinning up a thread takes about 2 seconds.
-- Idle threads waits for 5 seconds to be reused and then shuts down.
+- Idle threads waits for 5 seconds if not reused in that time it shuts down.
 - Max 5 threads can be running at the same time.
 - Request are placed in a "thread pool" if more than 5 threads are active.
 
 
 ###### Using it as a extension:
 ```javascript
-  const sirexjs = require('sirexjs');
+  const {
+  Services,
+  Middleware,
+  Extensions
+} = require('sirexjs');
 
-  let thread = await sirexjs.Extensions.threads('location_of_function', ['arg1','arg2','arg3'])
+  let thread = await Extensions.threads('location_of_function', ['arg1','arg2','arg3'])
   .received();
   // ex.
-  let thread = await sirexjs.Extensions.threads('/services/user/managers/test', ['hello'])
-  .received();
-```
-###### Using it through service gateway:
-```javascript
-const serviceGateway = require('services');
-
-  let thread = await serviceGateway.user.thread('thread_in_service_threads_folder',  ['arg1','arg2','arg3'])
-  .received();
-
-  //ex.
-  let thread = await serviceGateway.user.thread('test', ['arg1','arg2','arg3'])
+  let thread = await Extensions.threads('/services/user/managers/test', ['hello'])
   .received();
 ```
 
@@ -403,9 +462,13 @@ Example: <br/>
 sirexjs.Extensions.exceptions.system('your_message_here'); <br/>
 
 ```javascript
-const sirexjs = require('sirexjs');
+const {
+  Services,
+  Middleware,
+  Extensions
+} = require('sirexjs');
 
-throw sirexjs.Extensions.exceptions.system('Internal conflict found.');
+throw Extensions.exceptions.system('Internal conflict found.');
 ```
 
 Endpoint Response:
