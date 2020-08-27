@@ -10,24 +10,19 @@ module.exports = class Middleware {
       // Get all middleware
       const folderPath = process.cwd();
 
-      let Files = fs.readdirSync(`${folderPath}/src/middleware`);
+      let folders = fs.readdirSync(`${folderPath}/src/middleware`);
       
-      let foundServices = [];
+      let foundMiddleware = [];
 
-      var getJsFiles = new RegExp('\.js+$','i');
-
-      for(let file of Files) {
-        if (
-          fs.statSync(`${folderPath}/src/middleware/${file}`).isFile() &&
-          file.match(getJsFiles)
-        ) {
-          foundServices.push(file.split(".")[0]);
+      for (let folder of folders) {
+        if (fs.lstatSync(`${folderPath}/src/middleware/${folder}`).isDirectory()) {
+          foundMiddleware.push(folder);
         }
       }
-
-      // return foundServices;
-      for(let key in foundServices) {
-        let value = foundServices[key];
+      
+      // return foundMiddleware;
+      for(let key in foundMiddleware) {
+        let value = foundMiddleware[key];
         this[value] = require(`${folderPath}/src/middleware/${value}`);
       }
       logger.info('Middleware loaded.');
