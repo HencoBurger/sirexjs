@@ -1,7 +1,7 @@
 'use strict';
 
 const moment = require('moment');
-
+const crypto = require('crypto');
 class RestResponse {
 
   static setUrl(url) {
@@ -25,12 +25,14 @@ class RestResponse {
     // Service Unavailable
     // The server cannot handle the request (because it is overloaded or down for maintenance). Generally, this is a temporary state.[
     let status = 503;
-    let timestamp = moment.utc();
+    let timestamp = moment.utc().format();
+    let refId = crypto.createHash('md5').update(String(timestamp)).digest("hex");
     let response = {
       message: 'We seem to have a problem. Please contact support and reference the included information.',
       endpoint: RestResponse.requestUrl,
       method: RestResponse.requestMethod,
       timestamp: timestamp,
+      refId: refId
     };
 
     // Check to see if this is a system error
@@ -40,7 +42,7 @@ class RestResponse {
       response.errors = payload.data.errors;
     // Check to see if this is a response error
     } else if(payload instanceof Error) {
-      console.trace(`Timestamp: ${timestamp}`,payload);
+      console.trace(`refId: ${refId} Timestamp: ${timestamp}`, payload);
       if(payload.name === 'system') {
         response.message = payload.message;
       }

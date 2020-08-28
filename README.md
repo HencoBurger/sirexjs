@@ -42,13 +42,15 @@ Choose from the following options.
 - **thread - Create new Service Child Process.**
   Creates a thread template function for a Service "src/services/[service_name]/threads/[thread_name]".<br/>
 
+###Example
 
-Create a new service called “user” with an attached API end-point and save data to MongoDB.
+Initiating a new application also installes a small API for a TO-DO app. The TO-DO app uses a "tasks" service to list, create, update or delete TO-DO tasks.
+
 
 - [Run Development Mode](#run-development-mode)
 - [Environment File](#environment-file)
 - [Create Service](#create-service)
-- [Service Route](#service-route)
+- [Router](#router)
 - [Sub Routes](#service-sub-routes)
 - [Managers](#managers)
 - [Databases](#databases)
@@ -71,6 +73,8 @@ npm run dev
 This sets up a nodemon watcher.  The watcher restart your development server
 as soon as it dedects change in "/src" folder.
 
+For "production", you can use [PM2](https://pm2.keymetrics.io/).
+
 #### Environment File
 Creating a new application also creates an ".env" file. Its already setup as a development environment.
 
@@ -83,24 +87,41 @@ If you want to only start the application when database is loaded, use the event
 
 You can connect any database, MongoDB, MySQL, NeDB, CouchDB or you can connect all of them.  It is all up to you.
 
+All databases places within the database folder will be available through:
+
+```javascript
+const {
+  Services,
+  middleware,
+  Databases
+} = require('sirexjs');
+
+Databases.inMemory.create();
+```
+
 #### Create a Service
 
 From the Sirex-CLI Choose the options “service - Create new service” follow prompts and create your new service.
 
-The service can be used as a service that is attached to a API end-point or you can use it as a stand-alone collection of code that can be used inside other services.
+Services can be exposed through the "router" or its can be used internaly by other services.
 
-Follow the next steps to attach the service to a API end-point.
-
-#### Service Route
+#### Router
 Adding the following route gives you access to the service sub routes.
 
 ```javascript
-router.use('/tasks', serviceGateway.user.routes);
+
+const {
+  Services,
+  middleware
+} = require('sirexjs');
+
+router.use('/tasks', Services.tasks.routes);
 ```
 
-Example:<br/>
-project/src/router/index.js
+<b>Example:</b>
+
 ```javascript
+// src/router/index.js
 'use strict';
 
 const express = require('express');
@@ -122,13 +143,18 @@ module.exports = (function () {
   return router;
 })();
 ```
-#### service sub routes
-Add sub-routes to a service
+#### service routes
+Add routes to a service
 
 ```javascript
+const {
+  Services,
+  middleware
+} = require('sirexjs');
+
 router.get('/', [Middleware.auth], async (req, res) => {
   try {
-    console.log(Services.tasks.manager);
+    
     const list = await Services.tasks.manager('index')
       .init()
       .list();
@@ -140,16 +166,16 @@ router.get('/', [Middleware.auth], async (req, res) => {
   }
 });
 ```
-Example:<br/>
-/project/src/services/user/routes
+<b>Example:</b>
 
 ```javascript
+// src/router/services/tasks/routes/index.js
+
 'use strict';
 
 const express = require('express');
 const router = express.Router();
 
-// User authentication
 const {
   Services,
   Middleware,
@@ -241,37 +267,40 @@ const list = await Services.tasks.manager('index')
 Example - Task Manager
 
 ```javascript
+// src/router/services/tasks/managers/index.js
+
+'use strict';
+
 const {
   Services,
   Middleware,
   Extensions
 } = require('sirexjs');
 
-module.exports = class SignUp {
-  static async create(body) {
-    try {
-
-      const validate = validation();
-      validate.setValidFields({
-        'callsign': {
-          'rules': 'required'
-        },
-        'email': {
-          'rules': 'required|email'
-        }
-      });
-
-      if (validate.isValid(body)) {
-        return await user.model.createTask(validate.fields);
-      } else {
-        throw sirexjs.Extensions.exceptions(404, 'Could not create new user', validate.errors);
-      }
-    } catch (e) {
-      sirexjs.Extensions.logger.error("[managers][SignUp]", e);
-      throw e;
-    }
+module.exports = class tasksManager {
+  static init() {
+    return new this();
   }
-}
+
+  list() {
+    return [];
+  }
+
+  create(data) {
+
+    return {};
+  }
+
+  update(taskId, data) {
+
+    return {};
+  }
+
+  delete(taskId) {
+
+    return {};
+  }
+};
 ```
 
 #### Models
@@ -279,13 +308,13 @@ When you create a service a model folder structure is created by default.  You c
 
 With that said, its all up to you how you structure your models.
 
-#### Extensions
+### Extensions
 These methods are there to make your development process easier.
 
 ##### Logging
 Logger is and extension of Winston. For more about how to use logger go [here](https://www.npmjs.com/package/winston).
 
-Examples: <br/>
+<b>Examples:</b>
 
 ```javascript
 const {
@@ -315,15 +344,15 @@ const validate = Extensions.validation();
 validate.setValidFields({
   'callsign': {
     'rules': 'required',
-    field_name: 'App callsign'
+    'field_name': 'App callsign'
   },
   'email': {
     'rules': 'required|email',
-    field_name: 'Local email'
+    'field_name': 'Local email'
   },
   'address': {
     'props': 'required|email',
-    field_name: 'Local email'
+    'field_name': 'Local email'
   }
 });
 
@@ -404,45 +433,72 @@ Features:
 
 ###### Using it as a extension:
 ```javascript
-  const {
+// Tread function for "tasks service"
+// Threads have to return a function
+
+'use strict';
+
+const {
+  Services
+} = require('sirexjs');
+
+// createFile Thread function
+module.exports = function() {
+  // Put some long running code here.
+  return 'something'; // Return something when you are done
+};
+```
+
+```javascript
+// Run "tasks service" tread, or thread from another location
+
+'use strict';
+
+const {
   Services,
   Middleware,
   Extensions
 } = require('sirexjs');
 
-  let thread = await Extensions.threads('location_of_function', ['arg1','arg2','arg3'])
+  // Run thread attache to service
+  let thread = await Services.tasks.thread('createFile', ['arg1','arg2','arg3'])
   .received();
-  // ex.
-  let thread = await Extensions.threads('/services/user/managers/test', ['hello'])
+  
+  // Run thread function from any location
+  let thread = await Extensions.threads('/services/tasks/managers/treadFunction', ['hello'])
   .received();
 ```
 
 ##### Exceptions
 API response and exceptions functions work together. Make sure all exceptions caught is eventually passed to the route response of the API end-points to display any error messages to the user.  There are 3 kinds of exceptions that can be thrown.
 
-Exception types:
+<u>Exception types:</u>
 - Response
 - System
 - Standard
 
 All exceptions except "Response" will trigger a stack trace error log.
 
-###### Response
-Use case: <br/>
+###### <u>Response</u>
 Used when you have validation error to handle.
 
-Example: <br/>
-sirexjs.Extensions.exceptions.response(http_response_code, 'Description', colleciton_of_errors); <br/>
-
+<b>Example:</b>
 ```javascript
-const sirexjs = require('sirexjs');
-
-throw sirexjs.Extensions.exceptions.response(400, 'Could not create new user', validate.errors);
+sirexjs.Extensions.exceptions.response(http_response_code, 'Description', colleciton_of_errors);
 ```
 
-Endpoint Response:
+```javascript
+const {
+  Services,
+  Middleware,
+  Extensions
+} = require('sirexjs');
+
+throw Extensions.exceptions.response(400, 'Could not create new user', validate.errors);
+```
 
 ```json
+// Endpoint Response:
 {
     "message": "Following fields are invalid.",
     "endpoint": "/user/sign-up",
@@ -454,12 +510,13 @@ Endpoint Response:
 }
 ```
 
-###### System
-Use case: <br/>
+###### <u>System</u>
 Error relating to the API application.
 
-Example: <br/>
-sirexjs.Extensions.exceptions.system('your_message_here'); <br/>
+<b>Example:</b>
+```javascript
+sirexjs.Extensions.exceptions.system('your_message_here');
+```
 
 ```javascript
 const {
@@ -471,9 +528,10 @@ const {
 throw Extensions.exceptions.system('Internal conflict found.');
 ```
 
-Endpoint Response:
+
 
 ```json
+// Endpoint Response:
 {
     "message": "Internal conflict found.",
     "endpoint": "/user/sign-up",
@@ -481,26 +539,35 @@ Endpoint Response:
     "timestamp": "2019-10-24T13:49:22.388Z"
 }
 ```
-###### Standard
-Use case:
-Any exceptions thrown by node.
+###### <u>Standard</u>
+Any exceptions thrown by the application. The the API response example is below.  The stack trace error will be logged.
 
-Endpoint Response:
+```javascript
+// Stack trace reference
+
+"Trace: refId: 3416e49bf1f4758234345cb79d1550ff Timestamp: 2020-08-28T12:42:02Z"
+
+```
 
 ```json
+// Endpoint Response:
 {
     "message": "We seem to have a problem. Please contact support and reference the included information.",
-    "endpoint": "/user/sign-up",
-    "method": "POST",
-    "timestamp": "2019-10-24T14:05:55.588Z"
+    "endpoint": "/tasks",
+    "method": "GET",
+    "timestamp": "2020-08-28T12:42:02Z",
+    "refId": "3416e49bf1f4758234345cb79d1550ff"
 }
 ```
 
 ##### API Response
-Display data back to users. <br/>
+Display data back to users.
+
 The response function can handle succeeded and exception responses to the user.
 
-<code>res.restResponse(responseData);</code>
+```javascript
+res.restResponse(responseData);
+```
 
 Example:
 ```javascript
