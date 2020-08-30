@@ -8,8 +8,11 @@ module.exports = class Services {
 
   get model() {
     try {
-      const model = require(`${process.cwd()}/src/services/${this.serviceName}/model`);
-      return new model();
+      if (typeof this._connection === 'undefined') {
+        const model = require(`${process.cwd()}/src/services/${this.serviceName}/model`);
+        this._connection = new model();
+      }
+      return this._connection;
     } catch(e) {
       logger.error(`[core][services][model] ${e}`);
       throw e;
@@ -77,7 +80,7 @@ module.exports = class Services {
         } [value];
 
         this[value] = new serviceClass();
-        logger.info(`Services loaded.`);
+        logger.info(`Services loading...`);
       }
     } catch(e) {
       logger.error(`[sirexjs][services][loadServices]`, e);

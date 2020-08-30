@@ -1,6 +1,17 @@
 'use strict';
 
 module.exports.load = (hooks = {}) => {
+  const sirexjsPackage = require(`../../package.json`);
+  console.log(`
+ ######  #### ########  ######## ##     ##       ##  ######
+##    ##  ##  ##     ## ##        ##   ##        ## ##    ##
+##        ##  ##     ## ##         ## ##         ## ##
+ ######   ##  ########  ######      ###          ##  ######
+      ##  ##  ##   ##   ##         ## ##   ##    ##       ##
+##    ##  ##  ##    ##  ##        ##   ##  ##    ## ##    ##
+ ######  #### ##     ## ######## ##     ##  ######   ######
+v${sirexjsPackage.version}
+`);
   if (typeof hooks.beforeLoad !== 'undefined' && typeof hooks.beforeLoad === 'function') {
     this.beforeLoad = hooks.beforeLoad();
   }
@@ -13,11 +24,16 @@ module.exports.load = (hooks = {}) => {
   require(`${process.cwd()}/node_modules/dotenv`).config();
   require(`${process.cwd()}/node_modules/app-module-path`).addPath(`${process.cwd()}/src`);
 
-  const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
-  
-  sirexjs.Databases.load();
-  sirexjs.Middleware.load();
-  sirexjs.Services.load();
+  const {
+    Databases,
+    Middleware,
+    Services,
+    Extensions
+  } = require(`${process.cwd()}/node_modules/sirexjs`);
+
+  Databases.load();
+  Middleware.load();
+  Services.load();
 
   // const router = require('core/router');
   const express = require(`${process.cwd()}/node_modules/express`);
@@ -38,10 +54,10 @@ module.exports.load = (hooks = {}) => {
   app.use(fileUpload()); // Upload files
   
   // Custom response for all reoutes
-  app.use(sirexjs.Extensions.restResponse);
+  app.use(Extensions.restResponse);
 
   // View requests
-  app.use(sirexjs.Extensions.routeRequest);
+  app.use(Extensions.routeRequest);
 
   let apiVersion = (typeof process.env.API_VERSION !== 'undefined') ? process.env.API_VERSION : '';
   // Load routing
@@ -53,8 +69,8 @@ module.exports.load = (hooks = {}) => {
 
   // Spin up application after db connected
   app.listen(process.env.APP_PORT, function() {
-    sirexjs.Extensions.logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
-    sirexjs.Extensions.logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
+    Extensions.logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
+    Extensions.logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
     if (typeof hooks.created !== 'undefined' && typeof hooks.created === 'function') {
       hooks.created(app);
     }

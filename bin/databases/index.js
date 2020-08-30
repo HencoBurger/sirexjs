@@ -25,7 +25,7 @@ module.exports = class Databases {
         let value = foundDatabases[key];
         this[value] = require(`${folderPath}/src/databases/${value}`);
       }
-      logger.info('Databases loaded.');
+      logger.info('Databases loading...');
     } catch (e) {
       logger.error(`[sirexjs][databases][loadDatabase]`, e);
       throw e;

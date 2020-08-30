@@ -25,7 +25,7 @@ module.exports = class Middleware {
         let value = foundMiddleware[key];
         this[value] = require(`${folderPath}/src/middleware/${value}`);
       }
-      logger.info('Middleware loaded.');
+      logger.info('Middleware loading...');
     } catch(e) {
       logger.error(`[sirexjs][middleware][loadMiddleware]`, e);
       throw e;
