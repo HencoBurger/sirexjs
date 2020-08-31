@@ -81,13 +81,13 @@ Creating a new application also creates an ".env" file. Its already setup as a d
 #### Databases
 Creating a new database connection also creates a new folder which contains an example index.js file.
 
-This new file exports a class, you can extend this class or create your own implementation.
+This new file exports a class, you can extend this class or create your own implementation. 
 
 If you want to only start the application when database is loaded, use the event hooks in Root index.js file.
 
 You can connect any database, MongoDB, MySQL, NeDB, CouchDB or you can connect all of them.  It is all up to you.
 
-All databases places within the database folder will be available through:
+You can access your databases through:
 
 ```javascript
 const {
@@ -96,7 +96,7 @@ const {
   Databases
 } = require('sirexjs');
 
-Databases.inMemory.create();
+const inMemoryDBInstance = new Databases.inMemory();
 ```
 
 #### Create a Service

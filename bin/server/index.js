@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports.load = (hooks = {}) => {
+module.exports.load = async (hooks = {}) => {
   const sirexjsPackage = require(`../../package.json`);
   console.log(`
  ######  #### ########  ######## ##     ##       ##  ######
@@ -13,7 +13,7 @@ module.exports.load = (hooks = {}) => {
 v${sirexjsPackage.version}
 `);
   if (typeof hooks.beforeLoad !== 'undefined' && typeof hooks.beforeLoad === 'function') {
-    this.beforeLoad = hooks.beforeLoad();
+    await hooks.beforeLoad();
   }
 
   const packageJson = require(`${process.cwd()}/package.json`);
@@ -64,16 +64,15 @@ v${sirexjsPackage.version}
   app.use(`/${apiVersion}`, routes);
 
   if (typeof hooks.beforeCreate !== 'undefined' && typeof hooks.beforeCreate === 'function') {
-    hooks.beforeCreate(app);
+    await hooks.beforeCreate(app);
   }
 
   // Spin up application after db connected
-  app.listen(process.env.APP_PORT, function() {
+  app.listen(process.env.APP_PORT, async () => {
     Extensions.logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
     Extensions.logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
     if (typeof hooks.created !== 'undefined' && typeof hooks.created === 'function') {
-      hooks.created(app);
+      await hooks.created(app);
     }
   });
-
 };
