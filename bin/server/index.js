@@ -1,10 +1,19 @@
 'use strict';
 
-const Databases = require('../databases');
-
-module.exports.load = (hooks = {}) => {
+module.exports.load = async (hooks = {}) => {
+  const sirexjsPackage = require(`../../package.json`);
+  console.log(`
+ ######  #### ########  ######## ##     ##       ##  ######
+##    ##  ##  ##     ## ##        ##   ##        ## ##    ##
+##        ##  ##     ## ##         ## ##         ## ##
+ ######   ##  ########  ######      ###          ##  ######
+      ##  ##  ##   ##   ##         ## ##   ##    ##       ##
+##    ##  ##  ##    ##  ##        ##   ##  ##    ## ##    ##
+ ######  #### ##     ## ######## ##     ##  ######   ######
+v${sirexjsPackage.version}
+`);
   if (typeof hooks.beforeLoad !== 'undefined' && typeof hooks.beforeLoad === 'function') {
-    this.beforeLoad = hooks.beforeLoad();
+    await hooks.beforeLoad();
   }
 
   const packageJson = require(`${process.cwd()}/package.json`);
@@ -15,7 +24,16 @@ module.exports.load = (hooks = {}) => {
   require(`${process.cwd()}/node_modules/dotenv`).config();
   require(`${process.cwd()}/node_modules/app-module-path`).addPath(`${process.cwd()}/src`);
 
-  const sirexjs = require(`${process.cwd()}/node_modules/sirexjs`);
+  const {
+    Databases,
+    Middleware,
+    Services,
+    Extensions
+  } = require(`${process.cwd()}/node_modules/sirexjs`);
+
+  Databases.load();
+  Middleware.load();
+  Services.load();
 
   // const router = require('core/router');
   const express = require(`${process.cwd()}/node_modules/express`);
@@ -34,36 +52,27 @@ module.exports.load = (hooks = {}) => {
   app.use(bodyParser.json()); // support json encoded bodies
 
   app.use(fileUpload()); // Upload files
-
+  
   // Custom response for all reoutes
-  app.use(sirexjs.Extensions.restResponse);
+  app.use(Extensions.restResponse);
 
   // View requests
-  app.use(sirexjs.Extensions.routeRequest);
+  app.use(Extensions.routeRequest);
 
   let apiVersion = (typeof process.env.API_VERSION !== 'undefined') ? process.env.API_VERSION : '';
   // Load routing
   app.use(`/${apiVersion}`, routes);
 
   if (typeof hooks.beforeCreate !== 'undefined' && typeof hooks.beforeCreate === 'function') {
-    hooks.beforeCreate(app);
+    await hooks.beforeCreate(app);
   }
-  
-  Databases.connect();
-  // Check to see if the databases are ready to be used by application
-  let dbConnect = setInterval(() => {
 
-    if (process.db_status) {
-      // Spin up application after db connected
-      app.listen(process.env.APP_PORT, function() {
-        sirexjs.Extensions.logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
-        sirexjs.Extensions.logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
-        if (typeof hooks.created !== 'undefined' && typeof hooks.created === 'function') {
-          hooks.created(app);
-        }
-      });
-
-      clearInterval(dbConnect);
+  // Spin up application after db connected
+  app.listen(process.env.APP_PORT, async () => {
+    Extensions.logger.info(`${process.env.APP_NAME} v${process.env.APP_VERSION} running on port ${process.env.APP_PORT}`);
+    Extensions.logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
+    if (typeof hooks.created !== 'undefined' && typeof hooks.created === 'function') {
+      await hooks.created(app);
     }
-  },1);
+  });
 };

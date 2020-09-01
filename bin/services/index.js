@@ -8,9 +8,11 @@ module.exports = class Services {
 
   get model() {
     try {
-      const model = require(`${process.cwd()}/src/services/${this.serviceName}/model`);
-
-      return new model();
+      if (typeof this._connection === 'undefined') {
+        const model = require(`${process.cwd()}/src/services/${this.serviceName}/model`);
+        this._connection = new model();
+      }
+      return this._connection;
     } catch(e) {
       logger.error(`[core][services][model] ${e}`);
       throw e;
@@ -46,26 +48,30 @@ module.exports = class Services {
     }
   }
 
+  /**
+   * Load all services created by SirexJS-CLI
+   */
   static load() {
     try {
-      // Get all services
+      // Get current folder path
       const folderPath = process.cwd();
 
+      // Get all services in the src/services folder, this folder structure was created by the CLI
       let folders = fs.readdirSync(`${folderPath}/src/services`);
       let foundServices = [];
 
+      // Get all services folders and push their names into list of services
       for(let folder of folders) {
         if(fs.lstatSync(`${folderPath}/src/services/${folder}`).isDirectory()) {
           foundServices.push(folder);
         }
       }
 
-      // return foundServices;
-      let servicesFolders = {};
+      // Initialize services
       for(let key in foundServices) {
         let value = foundServices[key];
 
-        const myClass = {
+        const serviceClass = {
           [value]: class extends Services {
             get serviceName() {
               return value;
@@ -73,10 +79,9 @@ module.exports = class Services {
           }
         } [value];
 
-        servicesFolders[value] = new myClass();
+        this[value] = new serviceClass();
+        logger.info(`Services loading...`);
       }
-
-      return servicesFolders;
     } catch(e) {
       logger.error(`[sirexjs][services][loadServices]`, e);
       throw e;
