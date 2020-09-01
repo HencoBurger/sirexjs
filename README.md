@@ -1,80 +1,118 @@
 # SirexJs
 Service layer architecture for Express. Sir-(vice) Ex-(press)
 
-SirexJs is not a new "framework", but more of a way of using Express to build API's.
+SirexJs was not created to be a new "framework", but more of a way of using Express to build API's.
 
-Like the Express website says "Express is a fast, unopinionated, minimalist web framework for Node.js.</br>
-SirexJs is an opinion on how build API's with Express.
+Like the ExpressJS website says "Express is a fast, un-opinionated, minimalist web framework for Node.js.
+SirexJs is an opinion on how to build API's with Express.
 
 #### Inspiration
 
-SirexJs was inspired by the Microservices architecture. <br/>
-You can think of a SirexJs <b><u>services</u></b> as a:<br/>
-Stand-alone features or grouping of code with its own routing table that connects to one database model.  SirexJS will also keep track of a Services routing, managers and model connection. So one service can easily communicate with another service.
+SirexJs was inspired by the Microservices architecture. 
+You can think of a SirexJs <b><u>services</u></b> as a:
+Stand-alone feature or grouping of code with its own routing table that connects to one database model.  One service can easily communicate with another service.
 
 ##### Updates
 Read more about [version updates](CHANGELOG.md).
 
+##### Postman Example
+Download a example API routes for Todo app to test in [Postman](postman/todo.postman_collection.json).
+
 ## CLI
 ### Install
-Install SirexJs-CLI globally. This will help you set up you API boilerplate.  The SirexJS boilerplace comes with example "Task Service" witch you can plug into a classic "<em>To-Do</em>" app.
+Install SirexJs-CLI globally. This will help you set up you API boilerplate.  The SirexJS boilerplate comes with <u>example</u> <b>"Task Service"</b> witch you can plug into a classic "<em>To-Do</em>" app.
 
 ```
 npm i -g sirexjs-cli
 ```
 
-Run "sirex-cli" in you project folder or where ever you want to start your new project. </br>
+### Getting Started
+
+Run "sirex-cli" in you project folder or where ever you want to start your new project.
+
+The below code snippets follow the supplied <b>"Task Service"</b> example.
 ```
 sirexjs-cli
 ```
-### Getting Started
 
-Choose from the following options.
+
+<u>Choose from the following options:</u>
 
 - **init - Create new project.**
-  Navigate to your project folder or ask SirexJs to create a new project folder structure for you.<br/>
+  Navigate to your project folder or ask SirexJs to create a new project folder structure for you.
 - **service - Create new service.**
-  Use this option to create the folder structure and initial code to start developing your new service.<br/>
+  Use this option to create the folder structure and initial code to start developing your new service.
 - **database - Create a connection to your preferred database.**
-  Create a database initialization template.<br/> This is not needed to run SirexJs but it helps to know what to connect to.
+  Create a database initialization template. This is not needed to run SirexJs but it helps to know what to connect to.
 - **middleware - Create new middleware.**
-  Creates a middleware template function in "src/middleware".<br/> ExpressJs middleware function.
+  Creates a middleware template function in "src/middleware". ExpressJs middleware function.
 - **thread - Create new Service Child Process.**
-  Creates a thread template function for a Service "src/services/[service_name]/threads/[thread_name]".<br/>
+  Creates a thread template function for a Service "src/services/[service_name]/threads/[thread_name]".
 
 ###Example
 
-Initiating a new application also installes a small API for a TO-DO app. The TO-DO app uses a "tasks" service to list, create, update or delete TO-DO tasks.
-
-
 - [Run Development Mode](#run-development-mode)
+- [Start Hooks](#start-hooks)
 - [Environment File](#environment-file)
-- [Create Service](#create-service)
-- [Router](#router)
-- [Sub Routes](#service-sub-routes)
-- [Managers](#managers)
 - [Databases](#databases)
-- [Models](#models)
-- [Access Mongoose Types](#access-mongoose-types)
+- [Router](#router)
+- [Services](#create-service)
+  - [Routes](#service-routes)
+  - [Managers](#managers)
+  - [Models](#models)
 - [Extensions](#extensions)
   - [Logging](#logging)
   - [Validation](#validation)
   - [Threads](#threads)
   - [Exceptions](#exceptions)
   - [API Response](#api-response)
-- [Threads (Child Process)](#threads)
 
 #### Run development Mode
-Run your application in development mode by running this command.<br/>
+Run your application in development mode by running this command.
 ```javascript
 npm run dev
 ```
 
 This sets up a nodemon watcher.  The watcher restart your development server
-as soon as it dedects change in "/src" folder.
+as soon as it detects change in "/src" folder.
 
-For "production", you can use [PM2](https://pm2.keymetrics.io/).
+For "production", you can use [PM2](https://pm2.keymetrics.io/). But this is up to you.
 
+#### Start Hooks
+There are three hooks you can use while your API spins up.
+Return a promise in these hook functions.
+
+- <b>beforeLoad</b>
+Before anything is loaded, even environment variables
+- <b>beforeCreate</b>
+After all packages where loaded and before the API spins up.
+You also have access to the app API object
+- <b>created</b>
+API is running
+You also have access to the app API object
+
+```javascript
+// todo-app/index.js
+
+'use strict';
+
+const {
+  Server,
+  Databases
+} = require('sirexjs');
+
+Server.load({
+  beforeLoad: async () => {
+    // Before anything is loaded, even environment variables
+  },
+  beforeCreate: async (app) => {
+    // Callback has access to nodejs instance via "app"
+  },
+  created: async (app) => {
+    // Callback has access to nodejs instance via "app"
+  }
+});
+```
 #### Environment File
 Creating a new application also creates an ".env" file. Its already setup as a development environment.
 
@@ -98,13 +136,6 @@ const {
 
 const inMemoryDBInstance = new Databases.inMemory();
 ```
-
-#### Create a Service
-
-From the Sirex-CLI Choose the options “service - Create new service” follow prompts and create your new service.
-
-Services can be exposed through the "router" or its can be used internaly by other services.
-
 #### Router
 Adding the following route gives you access to the service sub routes.
 
@@ -143,6 +174,12 @@ module.exports = (function () {
   return router;
 })();
 ```
+#### Services
+
+From the Sirex-CLI Choose the options “service - Create new service” follow prompts and create your new service.
+
+Services can be exposed through the "router" or it can be used internally by other services.
+
 #### service routes
 Add routes to a service
 
@@ -328,7 +365,7 @@ Extensions.logger.error("Error logs here");
 ```
 
 ##### Validation
-Validation uses [validator](https://www.npmjs.com/package/validator) internally. It was modified to be a bit more "compact".<br/>
+Validation uses [validator](https://www.npmjs.com/package/validator) internally. It was modified to be a bit more "compact".
 Validation also has the ability to validate nested properties.
 
 ###### Flat validation
@@ -342,10 +379,6 @@ const {
 const validate = Extensions.validation();
 
 validate.setValidFields({
-  'callsign': {
-    'rules': 'required',
-    'field_name': 'App callsign'
-  },
   'email': {
     'rules': 'required|email',
     'field_name': 'Local email'
@@ -374,9 +407,9 @@ const {
 const validate = Extensions.validation();
 
 validate.setValidFields({
-  'callsign': {
+  'firstName': {
     'rules': 'required',
-    field_name: 'App callsign'
+    field_name: 'Your name'
   },
   'address': {
     'props': {
@@ -484,7 +517,7 @@ Used when you have validation error to handle.
 
 <b>Example:</b>
 ```javascript
-sirexjs.Extensions.exceptions.response(http_response_code, 'Description', colleciton_of_errors);
+sirexjs.Extensions.exceptions.response(http_response_code, 'Description', collection_of_errors);
 ```
 
 ```javascript
