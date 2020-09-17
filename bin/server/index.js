@@ -17,12 +17,12 @@ v${sirexjsPackage.version}
   }
 
   const packageJson = require(`${process.cwd()}/package.json`);
+  require(`${process.cwd()}/node_modules/dotenv`).config();
+  require(`${process.cwd()}/node_modules/app-module-path`).addPath(`${process.cwd()}/src`);
+  
   process.env.APP_VERSION = packageJson.version;
   process.env.APP_PORT = (typeof process.env.APP_PORT === 'undefined') ? 3000 : process.env.APP_PORT;
   process.env.NODE_ENV = (typeof process.env.NODE_ENV === 'undefined') ? 'dev' : process.env.NODE_ENV;
-
-  require(`${process.cwd()}/node_modules/dotenv`).config();
-  require(`${process.cwd()}/node_modules/app-module-path`).addPath(`${process.cwd()}/src`);
 
   const {
     Databases,

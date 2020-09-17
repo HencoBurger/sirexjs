@@ -8,12 +8,8 @@ module.exports = class Services {
 
   get model() {
     try {
-      if (typeof this._connection === 'undefined') {
-        const model = require(`${process.cwd()}/src/services/${this.serviceName}/model`);
-        this._connection = new model();
-      }
-      return this._connection;
-    } catch(e) {
+      return require(`${process.cwd()}/src/services/${this.serviceName}/model`);
+    } catch (e) {
       logger.error(`[core][services][model] ${e}`);
       throw e;
     }
